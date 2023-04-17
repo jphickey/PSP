@@ -148,7 +148,7 @@ int32 unsock_intf_OpenPort(unsock_intf_State_t *State, uint32 Instance)
     {
         perror("unsock_intf_OpenPort: socket()");
     }
-    else if (State->ConfigDir == CFE_PSP_IODRIVER_DIRECTION_INPUT_ONLY)
+    else if (State->ConfigDir == CFE_PSP_IODriver_Direction_INPUT_ONLY)
     {
         OS_printf("%s(): Opening input side: %s\n", __func__, State->LocalAddr.sun_path);
 
@@ -312,7 +312,7 @@ int32 unsock_intf_WritePacket(unsock_intf_State_t *State, CFE_PSP_IODriver_Write
  ** \par Assumptions, External Events, and Notes:
  **          None
  **
- ** \param[in] CommandCode  The CFE_PSP_IODRIVER_xxx command.
+ ** \param[in] CommandCode  The CFE_PSP_IODriver_xxx command.
  ** \param[in] Instance     Board instance. Set to 1 if there is only one serial card.
  ** \param[in] SubChannel   Subchannel number. Set to 0 for devices that do not have multiple channels.
  ** \param[in] Arg          The arguments for the corresponding command.
@@ -339,8 +339,8 @@ int32 unsockDevCmd(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_P
 
         switch(CommandCode)
         {
-        case CFE_PSP_IODRIVER_NOOP:
-        case CFE_PSP_IODRIVER_PACKET_IO_NOOP:
+        case CFE_PSP_IODriver_NOOP:
+        case CFE_PSP_IODriver_PACKET_IO_NOOP:
         {
             /* NO-OP should return success -
              * This is a required opcode as "generic" clients may use it to
@@ -350,7 +350,7 @@ int32 unsockDevCmd(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_P
             break;
         }
         /* Start/stop opcodes */
-        case CFE_PSP_IODRIVER_SET_RUNNING:       /**< int32 argument, 0=stop 1=start device */
+        case CFE_PSP_IODriver_SET_RUNNING:       /**< int32 argument, 0=stop 1=start device */
         {
             if (Arg.U32)
             {
@@ -374,7 +374,7 @@ int32 unsockDevCmd(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_P
             }
             break;
         }
-        case CFE_PSP_IODRIVER_GET_RUNNING:       /**< no argument, returns positive nonzero (true) if running and zero (false) if stopped, negative on error */
+        case CFE_PSP_IODriver_GET_RUNNING:       /**< no argument, returns positive nonzero (true) if running and zero (false) if stopped, negative on error */
         {
             if (InstPtr->DeviceFd >= 0)
             {
@@ -386,32 +386,32 @@ int32 unsockDevCmd(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_P
             }
             break;
         }
-        case CFE_PSP_IODRIVER_SET_CONFIGURATION: /**< const string argument (device-dependent content) */
+        case CFE_PSP_IODriver_SET_CONFIGURATION: /**< const string argument (device-dependent content) */
         {
             ReturnCode = unsock_intf_Configure(InstPtr, Instance, (const char *)Arg.ConstVptr);
             break;
         }
-        case CFE_PSP_IODRIVER_GET_CONFIGURATION: /**< void * argument (device-dependent content) */
+        case CFE_PSP_IODriver_GET_CONFIGURATION: /**< void * argument (device-dependent content) */
         {
             break;
         }
-        case CFE_PSP_IODRIVER_LOOKUP_SUBCHANNEL: /**< const char * argument, looks up ChannelName and returns positive value for channel number, negative value for error */
+        case CFE_PSP_IODriver_LOOKUP_SUBCHANNEL: /**< const char * argument, looks up ChannelName and returns positive value for channel number, negative value for error */
         {
             /* Does not support "subchannels"; always return 0 */
             ReturnCode = 0;
             break;
         }
-        case CFE_PSP_IODRIVER_SET_DIRECTION:     /**< CFE_PSP_IODriver_Direction_t argument */
+        case CFE_PSP_IODriver_SET_DIRECTION:     /**< CFE_PSP_IODriver_Direction_t argument */
         {
             CFE_PSP_IODriver_Direction_t Dir = (CFE_PSP_IODriver_Direction_t)Arg.U32;
-            if (Dir == CFE_PSP_IODRIVER_DIRECTION_INPUT_ONLY || Dir == CFE_PSP_IODRIVER_DIRECTION_OUTPUT_ONLY)
+            if (Dir == CFE_PSP_IODriver_Direction_INPUT_ONLY || Dir == CFE_PSP_IODriver_Direction_OUTPUT_ONLY)
             {
                 InstPtr->ConfigDir = Dir;
                 ReturnCode = CFE_PSP_SUCCESS;
             }
             break;
         }
-        case CFE_PSP_IODRIVER_QUERY_DIRECTION:   /**< CFE_PSP_IODriver_Direction_t argument */
+        case CFE_PSP_IODriver_QUERY_DIRECTION:   /**< CFE_PSP_IODriver_Direction_t argument */
         {
             CFE_PSP_IODriver_Direction_t *DirPtr = (CFE_PSP_IODriver_Direction_t *)Arg.Vptr;
             if (DirPtr != NULL)
@@ -421,17 +421,17 @@ int32 unsockDevCmd(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_P
             }
             break;
         }
-        case CFE_PSP_IODRIVER_PACKET_IO_READ:   /**< CFE_PSP_IODriver_ReadPacketBuffer_t argument */
+        case CFE_PSP_IODriver_PACKET_IO_READ:   /**< CFE_PSP_IODriver_ReadPacketBuffer_t argument */
         {
-            if (InstPtr->ConfigDir == CFE_PSP_IODRIVER_DIRECTION_INPUT_ONLY)
+            if (InstPtr->ConfigDir == CFE_PSP_IODriver_Direction_INPUT_ONLY)
             {
                 ReturnCode = unsock_intf_ReadPacket(InstPtr, (CFE_PSP_IODriver_ReadPacketBuffer_t *)Arg.Vptr);
             }
             break;
         }
-        case CFE_PSP_IODRIVER_PACKET_IO_WRITE:  /**< CFE_PSP_IODriver_WritePacketBuffer_t argument */
+        case CFE_PSP_IODriver_PACKET_IO_WRITE:  /**< CFE_PSP_IODriver_WritePacketBuffer_t argument */
         {
-            if (InstPtr->ConfigDir == CFE_PSP_IODRIVER_DIRECTION_OUTPUT_ONLY)
+            if (InstPtr->ConfigDir == CFE_PSP_IODriver_Direction_OUTPUT_ONLY)
             {
                 ReturnCode = unsock_intf_WritePacket(InstPtr, (CFE_PSP_IODriver_WritePacketBuffer_t *)Arg.Vptr);
             }

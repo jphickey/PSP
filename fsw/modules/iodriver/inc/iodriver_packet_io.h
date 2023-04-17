@@ -6,16 +6,13 @@
  */
 
 /**
- * \file iodriver_packet_io.h
+ * \file
  *
- * \date Mar 4, 2016
- * \author joseph.p.hickey@nasa.gov
- *
+ * I/O adapter for packet/message-based interfaces
  */
 
-
-#ifndef CFE_PSP_IODRIVER_PACKET_IO_H_
-#define CFE_PSP_IODRIVER_PACKET_IO_H_
+#ifndef CFE_PSP_IODRIVER_PACKET_IO_H
+#define CFE_PSP_IODRIVER_PACKET_IO_H
 
 /* Include all base definitions */
 #include "iodriver_base.h"
@@ -29,7 +26,7 @@
  */
 typedef struct
 {
-    uint32 OutputSize;                    ///< Number of channels in the i/o structure (length of "samples" array)
+    uint32      OutputSize; /**<  Number of channels in the i/o structure (length of "samples" array) */
     const void *BufferMem;
 } CFE_PSP_IODriver_WritePacketBuffer_t;
 
@@ -42,8 +39,8 @@ typedef struct
  */
 typedef struct
 {
-    uint32 BufferSize;                    ///< Number of channels in the i/o structure (length of "samples" array)
-    void *BufferMem;
+    uint32 BufferSize; /**<  Number of channels in the i/o structure (length of "samples" array) */
+    void * BufferMem;
 } CFE_PSP_IODriver_ReadPacketBuffer_t;
 
 /**
@@ -51,25 +48,24 @@ typedef struct
  */
 enum
 {
-    CFE_PSP_IODRIVER_PACKET_IO_NOOP = CFE_PSP_IODRIVER_PACKET_IO_CLASS_BASE,
+    CFE_PSP_IODriver_PACKET_IO_NOOP = CFE_PSP_IODriver_PACKET_IO_CLASS_BASE,
 
-    CFE_PSP_IODRIVER_PACKET_IO_READ,   /**< CFE_PSP_IODriver_ReadPacketBuffer_t argument */
-    CFE_PSP_IODRIVER_PACKET_IO_WRITE,  /**< CFE_PSP_IODriver_WritePacketBuffer_t argument */
+    CFE_PSP_IODriver_PACKET_IO_READ,  /**< CFE_PSP_IODriver_ReadPacketBuffer_t argument */
+    CFE_PSP_IODriver_PACKET_IO_WRITE, /**< CFE_PSP_IODriver_WritePacketBuffer_t argument */
 
-    CFE_PSP_IODRIVER_PACKET_IO_MAX
+    CFE_PSP_IODriver_PACKET_IO_MAX
 };
 
 /**
  * Additional error codes specific to Packet I/O
  *
- * These are based from the CFE_PSP_IODRIVER_PACKET_IO_CLASS_BASE so as to not conflict with other classes of I/O
+ * These are based from the CFE_PSP_IODriver_PACKET_IO_CLASS_BASE so as to not conflict with other classes of I/O
  */
 enum
 {
-    CFE_PSP_IODRIVER_PACKET_ERROR_BASE =  -(CFE_PSP_IODRIVER_PACKET_IO_CLASS_BASE + 0xFFFF),
-    CFE_PSP_IODRIVER_PACKET_LENGTH_ERROR,
-    CFE_PSP_IODRIVER_PACKET_CRC_ERROR
+    CFE_PSP_IODriver_PACKET_ERROR_BASE = -(CFE_PSP_IODriver_PACKET_IO_CLASS_BASE + 0xFFFF),
+    CFE_PSP_IODriver_PACKET_LENGTH_ERROR,
+    CFE_PSP_IODriver_PACKET_CRC_ERROR
 };
 
-
-#endif /* CFE_PSP_IODRIVER_PACKET_IO_H_ */
+#endif /* CFE_PSP_IODRIVER_PACKET_IO_H */

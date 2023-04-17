@@ -6,16 +6,13 @@
  */
 
 /**
- * \file iodriver_analog_io.h
+ * \file
  *
- *  Created on: Sep 30, 2015
- *  Created by: joseph.p.hickey@nasa.gov
- *
+ * I/O adapter for analog (ADC/DAC) devices
  */
 
-
-#ifndef CFE_PSP_IODRIVER_ANALOG_IO_H_
-#define CFE_PSP_IODRIVER_ANALOG_IO_H_
+#ifndef CFE_PSP_IODRIVER_ANALOG_IO_H
+#define CFE_PSP_IODRIVER_ANALOG_IO_H
 
 /* Include all base definitions */
 #include "iodriver_base.h"
@@ -29,8 +26,7 @@
  * This permits easier swapping between different phsyical hardware types, including those with
  * potentially less ADC/DAC precision, while presenting similar values to application code.
  */
-#define CFE_PSP_IODRIVER_ADC_BITWIDTH       24
-
+#define CFE_PSP_IODRIVER_ADC_BITWIDTH 24
 
 /**
  * Type abstraction for expressing analog ADC codes.
@@ -55,8 +51,8 @@ typedef int32 CFE_PSP_IODriver_AdcCode_t;
  */
 typedef struct
 {
-    uint16 NumChannels;                    ///< Number of channels in the i/o structure (length of "samples" array)
-    CFE_PSP_IODriver_AdcCode_t *Samples;           ///< Array for ADC/DAC samples
+    uint16 NumChannels;                  /**<  Number of channels in the i/o structure (length of "samples" array) */
+    CFE_PSP_IODriver_AdcCode_t *Samples; /**<  Array for ADC/DAC samples */
 } CFE_PSP_IODriver_AnalogRdWr_t;
 
 /**
@@ -64,13 +60,12 @@ typedef struct
  */
 enum
 {
-    CFE_PSP_IODRIVER_ANALOG_IO_NOOP = CFE_PSP_IODRIVER_ANALOG_IO_CLASS_BASE,
+    CFE_PSP_IODriver_ANALOG_IO_NOOP = CFE_PSP_IODriver_ANALOG_IO_CLASS_BASE,
 
-    CFE_PSP_IODRIVER_ANALOG_IO_READ_CHANNELS,   /**< CFE_PSP_IODriver_AnalogRdWr_t argument */
-    CFE_PSP_IODRIVER_ANALOG_IO_WRITE_CHANNELS,  /**< CFE_PSP_IODriver_AnalogRdWr_t argument */
+    CFE_PSP_IODriver_ANALOG_IO_READ_CHANNELS,  /**< CFE_PSP_IODriver_AnalogRdWr_t argument */
+    CFE_PSP_IODriver_ANALOG_IO_WRITE_CHANNELS, /**< CFE_PSP_IODriver_AnalogRdWr_t argument */
 
-    CFE_PSP_IODRIVER_ANALOG_IO_MAX
+    CFE_PSP_IODriver_ANALOG_IO_MAX
 };
 
-
-#endif /* CFE_PSP_IODRIVER_ANALOG_IO_H_ */
+#endif /* CFE_PSP_IODRIVER_ANALOG_IO_H */
