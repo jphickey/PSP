@@ -29,8 +29,8 @@
 **
 */
 
-#ifndef CFE_PSP_H
-#define CFE_PSP_H
+#ifndef CFE_PSP_ID_API_H
+#define CFE_PSP_ID_API_H
 
 /******************************************************************************
  INCLUDE FILES
@@ -39,45 +39,34 @@
 #include "common_types.h"
 #include "osapi.h"
 
-/*
- * All PSP API sub-components
- *
- * Historically these were all declared as part of a monolithic cfe_psp.h header file
- * Breaking them up aids in unit testability, allowing each sub-component to be tested
- * individually - particulary important for items where the implementation was moved to
- * a module.  The whole API is included here for backward compatibilty.
- */
-#include "cfe_psp_cache_api.h"
-#include "cfe_psp_cds_api.h"
-#include "cfe_psp_eepromaccess_api.h"
 #include "cfe_psp_error.h"
-#include "cfe_psp_exception_api.h"
-#include "cfe_psp_id_api.h"
-#include "cfe_psp_memaccess_api.h"
-#include "cfe_psp_memrange_api.h"
-#include "cfe_psp_port_api.h"
-#include "cfe_psp_ssr_api.h"
-#include "cfe_psp_timertick_api.h"
-#include "cfe_psp_version_api.h"
-#include "cfe_psp_watchdog_api.h"
 
 /******************************************************************************
  FUNCTION PROTOTYPES
  ******************************************************************************/
 
-/*
-** PSP entry point
-*/
 /*--------------------------------------------------------------------------------------*/
 /**
- * @brief PSP Entry Point to initialize the OSAL and start up the cFE
+ * @brief Returns the CPU ID as defined by the specific board and BSP.
  *
- * This is the entry point that the real-time OS calls to start our software.
- * This routine will do any BSP/OS-specific setup, then call the entry point of
- * the flight software (i.e. the cFE main entry point).
- *
- * @note The flight software (i.e. cFE) should not call this routine.
+ * @return The processor ID
  */
-void CFE_PSP_Main(void);
+uint32 CFE_PSP_GetProcessorId(void);
+
+/*--------------------------------------------------------------------------------------*/
+/**
+ * @brief Returns the Spacecraft ID (if any)
+ *
+ * @return The Spacecraft ID
+ */
+uint32 CFE_PSP_GetSpacecraftId(void);
+
+/*--------------------------------------------------------------------------------------*/
+/**
+ * @brief Returns the processor name
+ *
+ * @return The processor name
+ */
+const char *CFE_PSP_GetProcessorName(void);
 
 #endif

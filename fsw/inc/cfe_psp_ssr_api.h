@@ -29,8 +29,8 @@
 **
 */
 
-#ifndef CFE_PSP_H
-#define CFE_PSP_H
+#ifndef CFE_PSP_SSR_H
+#define CFE_PSP_SSR_H
 
 /******************************************************************************
  INCLUDE FILES
@@ -39,45 +39,25 @@
 #include "common_types.h"
 #include "osapi.h"
 
-/*
- * All PSP API sub-components
- *
- * Historically these were all declared as part of a monolithic cfe_psp.h header file
- * Breaking them up aids in unit testability, allowing each sub-component to be tested
- * individually - particulary important for items where the implementation was moved to
- * a module.  The whole API is included here for backward compatibilty.
- */
-#include "cfe_psp_cache_api.h"
-#include "cfe_psp_cds_api.h"
-#include "cfe_psp_eepromaccess_api.h"
 #include "cfe_psp_error.h"
-#include "cfe_psp_exception_api.h"
-#include "cfe_psp_id_api.h"
-#include "cfe_psp_memaccess_api.h"
-#include "cfe_psp_memrange_api.h"
-#include "cfe_psp_port_api.h"
-#include "cfe_psp_ssr_api.h"
-#include "cfe_psp_timertick_api.h"
-#include "cfe_psp_version_api.h"
-#include "cfe_psp_watchdog_api.h"
 
 /******************************************************************************
  FUNCTION PROTOTYPES
  ******************************************************************************/
 
-/*
-** PSP entry point
-*/
 /*--------------------------------------------------------------------------------------*/
 /**
- * @brief PSP Entry Point to initialize the OSAL and start up the cFE
+ * @brief Initializes the Solid State recorder memory for a particular platform
  *
- * This is the entry point that the real-time OS calls to start our software.
- * This routine will do any BSP/OS-specific setup, then call the entry point of
- * the flight software (i.e. the cFE main entry point).
+ * @note For the MCP750, this simply initializes the Hard Disk device.
  *
- * @note The flight software (i.e. cFE) should not call this routine.
+ * @param[in] bus
+ * @param[in] device
+ * @param[in] DeviceName
+ *
+ * @retval CFE_PSP_SUCCESS on success
+ * @retval CFE_PSP_ERROR on error
  */
-void CFE_PSP_Main(void);
+int32 CFE_PSP_InitSSR(uint32 bus, uint32 device, char *DeviceName);
 
 #endif

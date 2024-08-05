@@ -29,8 +29,8 @@
 **
 */
 
-#ifndef CFE_PSP_H
-#define CFE_PSP_H
+#ifndef CFE_PSP_CDS_API_H
+#define CFE_PSP_CDS_API_H
 
 /******************************************************************************
  INCLUDE FILES
@@ -39,45 +39,44 @@
 #include "common_types.h"
 #include "osapi.h"
 
-/*
- * All PSP API sub-components
- *
- * Historically these were all declared as part of a monolithic cfe_psp.h header file
- * Breaking them up aids in unit testability, allowing each sub-component to be tested
- * individually - particulary important for items where the implementation was moved to
- * a module.  The whole API is included here for backward compatibilty.
- */
-#include "cfe_psp_cache_api.h"
-#include "cfe_psp_cds_api.h"
-#include "cfe_psp_eepromaccess_api.h"
 #include "cfe_psp_error.h"
-#include "cfe_psp_exception_api.h"
-#include "cfe_psp_id_api.h"
-#include "cfe_psp_memaccess_api.h"
-#include "cfe_psp_memrange_api.h"
-#include "cfe_psp_port_api.h"
-#include "cfe_psp_ssr_api.h"
-#include "cfe_psp_timertick_api.h"
-#include "cfe_psp_version_api.h"
-#include "cfe_psp_watchdog_api.h"
 
 /******************************************************************************
  FUNCTION PROTOTYPES
  ******************************************************************************/
 
-/*
-** PSP entry point
-*/
 /*--------------------------------------------------------------------------------------*/
 /**
- * @brief PSP Entry Point to initialize the OSAL and start up the cFE
+ * @brief Fetches the size of the OS Critical Data Store area.
  *
- * This is the entry point that the real-time OS calls to start our software.
- * This routine will do any BSP/OS-specific setup, then call the entry point of
- * the flight software (i.e. the cFE main entry point).
+ * @param[out] SizeOfCDS Pointer to the variable that will store the size of the CDS
  *
- * @note The flight software (i.e. cFE) should not call this routine.
+ * @return 0 (OS_SUCCESS or CFE_PSP_SUCCESS) on success, -1 (OS_ERROR or CFE_PSP_ERROR) on error
  */
-void CFE_PSP_Main(void);
+int32 CFE_PSP_GetCDSSize(uint32 *SizeOfCDS);
+
+/*--------------------------------------------------------------------------------------*/
+/**
+ * @brief Writes to the CDS Block.
+ *
+ * @param[in] PtrToDataToWrite Pointer to the data that will be written to the CDS
+ * @param[in] CDSOffset        CDS offset
+ * @param[in] NumBytes         Number of bytes to write
+ *
+ * @return 0 (OS_SUCCESS or CFE_PSP_SUCCESS) on success, -1 (OS_ERROR or CFE_PSP_ERROR) on error
+ */
+int32 CFE_PSP_WriteToCDS(const void *PtrToDataToWrite, uint32 CDSOffset, uint32 NumBytes);
+
+/*--------------------------------------------------------------------------------------*/
+/**
+ * @brief Reads from the CDS Block
+ *
+ * @param[out] PtrToDataToRead Pointer to the location that will store the data to be read from the CDS
+ * @param[in]  CDSOffset       CDS offset
+ * @param[in]  NumBytes        Number of bytes to read
+ *
+ * @return 0 (OS_SUCCESS or CFE_PSP_SUCCESS) on success, -1 (OS_ERROR or CFE_PSP_ERROR) on error
+ */
+int32 CFE_PSP_ReadFromCDS(void *PtrToDataToRead, uint32 CDSOffset, uint32 NumBytes);
 
 #endif

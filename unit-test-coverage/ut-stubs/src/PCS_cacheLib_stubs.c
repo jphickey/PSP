@@ -15,30 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ************************************************************************/
-#define CFE_PSP_ERROR_H
 
 /**
  * @file
  *
- * Auto-Generated stub implementations for functions defined in cfe_psp_error header
+ * Auto-Generated stub implementations for functions defined in PCS_cacheLib header
  */
 
-#include "cfe_psp_error.h"
+#include "PCS_cacheLib.h"
 #include "utgenstub.h"
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CFE_PSP_StatusToString()
+ * Generated stub function for PCS_cacheTextUpdate()
  * ----------------------------------------------------
  */
-char *CFE_PSP_StatusToString(CFE_PSP_Status_t status, CFE_PSP_StatusString_t *status_string)
+PCS_STATUS PCS_cacheTextUpdate(void *adrs, size_t bytes)
 {
-    UT_GenStub_SetupReturnBuffer(CFE_PSP_StatusToString, char *);
+    UT_GenStub_SetupReturnBuffer(PCS_cacheTextUpdate, PCS_STATUS);
 
-    UT_GenStub_AddParam(CFE_PSP_StatusToString, CFE_PSP_Status_t, status);
-    UT_GenStub_AddParam(CFE_PSP_StatusToString, CFE_PSP_StatusString_t *, status_string);
+    UT_GenStub_AddParam(PCS_cacheTextUpdate, void *, adrs);
+    UT_GenStub_AddParam(PCS_cacheTextUpdate, size_t, bytes);
 
-    UT_GenStub_Execute(CFE_PSP_StatusToString, Basic, NULL);
+    UT_GenStub_Execute(PCS_cacheTextUpdate, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CFE_PSP_StatusToString, char *);
+    return UT_GenStub_GetReturnValue(PCS_cacheTextUpdate, PCS_STATUS);
 }

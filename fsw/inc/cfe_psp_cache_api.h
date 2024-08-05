@@ -29,8 +29,8 @@
 **
 */
 
-#ifndef CFE_PSP_H
-#define CFE_PSP_H
+#ifndef CFE_PSP_CACHE_API_H
+#define CFE_PSP_CACHE_API_H
 
 /******************************************************************************
  INCLUDE FILES
@@ -39,45 +39,24 @@
 #include "common_types.h"
 #include "osapi.h"
 
-/*
- * All PSP API sub-components
- *
- * Historically these were all declared as part of a monolithic cfe_psp.h header file
- * Breaking them up aids in unit testability, allowing each sub-component to be tested
- * individually - particulary important for items where the implementation was moved to
- * a module.  The whole API is included here for backward compatibilty.
- */
-#include "cfe_psp_cache_api.h"
-#include "cfe_psp_cds_api.h"
-#include "cfe_psp_eepromaccess_api.h"
 #include "cfe_psp_error.h"
-#include "cfe_psp_exception_api.h"
-#include "cfe_psp_id_api.h"
-#include "cfe_psp_memaccess_api.h"
-#include "cfe_psp_memrange_api.h"
-#include "cfe_psp_port_api.h"
-#include "cfe_psp_ssr_api.h"
-#include "cfe_psp_timertick_api.h"
-#include "cfe_psp_version_api.h"
-#include "cfe_psp_watchdog_api.h"
 
 /******************************************************************************
  FUNCTION PROTOTYPES
  ******************************************************************************/
 
-/*
-** PSP entry point
-*/
 /*--------------------------------------------------------------------------------------*/
 /**
- * @brief PSP Entry Point to initialize the OSAL and start up the cFE
+ * @brief This is a BSP-specific cache flush routine
  *
- * This is the entry point that the real-time OS calls to start our software.
- * This routine will do any BSP/OS-specific setup, then call the entry point of
- * the flight software (i.e. the cFE main entry point).
+ * Provides a common interface to flush the processor caches. This routine is in
+ * the BSP because it is sometimes implemented in hardware and sometimes taken
+ * care of by the RTOS.
  *
- * @note The flight software (i.e. cFE) should not call this routine.
+ * @param[in] type
+ * @param[in] address
+ * @param[in] size
  */
-void CFE_PSP_Main(void);
+void CFE_PSP_FlushCaches(uint32 type, void *address, uint32 size);
 
 #endif

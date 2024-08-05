@@ -2,7 +2,7 @@
 #    Stub libraries for coverage testing
 # ----------------------------------------
 
-# This provides suitable "stub" implementations of every 
+# This provides suitable "stub" implementations of every
 # function call used internally by the various OSAL modules
 # for which there is not a stub already defined.
 #
@@ -13,27 +13,27 @@
 #     i.e. memset, strcmp, etc - these should be relevant for all
 #     supported operating systems as they are standard C
 # - Stub versions of internal "shared" OSAL implementation functions
-#     i.e. everything declared in the internal API.  These are needed by 
+#     i.e. everything declared in the internal API.  These are needed by
 #     any coverage test referencing on the shared/ng OSAL layer.
 #
 
 # The "ut_libc_stubs" target provides stub versions of C library calls.
 # They are prefixed with "OCS_" and target code must be recompiled to
 # call the OCS_ version of the syscall instead of the regular syscall.
-# This is because in some circumstances for these calls the stub actually 
-# needs to invoke the real version or else weird things happen.  
+# This is because in some circumstances for these calls the stub actually
+# needs to invoke the real version or else weird things happen.
 # This library includes stubs from all supported operating systems.  This
 # is generally OK as we do not use any actual OS system headers
 #
-# These files are generally organized to match whatever header file  
+# These files are generally organized to match whatever header file
 # defines the function. For instance, POSIX defines the "mqueue.h"
 # header file which in turn provides mq_open, mq_close, etc.  So
-# the OCS_mq_open, OCS_mq_close declarations are in overrides/mqueue.h, and 
+# the OCS_mq_open, OCS_mq_close declarations are in overrides/mqueue.h, and
 # the respective implementation is in posix-mqueue-stubs.c.
 #
-# This keeps things relatively organized, and by keeping the source files 
+# This keeps things relatively organized, and by keeping the source files
 # relatively small and targeted like this the linker should only pull in
-# the OCS functions that are actually used. 
+# the OCS functions that are actually used.
 #
 add_library(ut_psp_libc_stubs STATIC EXCLUDE_FROM_ALL
     src/libc-stdio-stubs.c
@@ -52,6 +52,7 @@ add_library(ut_psp_libc_stubs STATIC EXCLUDE_FROM_ALL
     src/vxworks-spyLib-stubs.c
     src/vxworks-spyLibP-stubs.c
     src/rtems-bsdnet-stubs.c
+    src/PCS_unistd_stubs.c
 )
 
 target_include_directories(ut_libc_stubs PUBLIC
