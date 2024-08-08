@@ -35,11 +35,9 @@
 #include "utstubs.h"
 #include <string.h>
 
-
 /*
 ** Functions
 */
-
 
 void UT_DefaultHandler_CFE_PSP_GetVersionString(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {

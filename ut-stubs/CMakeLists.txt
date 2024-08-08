@@ -10,12 +10,15 @@ add_library(ut_psp_api_stubs
     src/cfe_psp_error_stubs.c
     src/cfe_psp_exception_api_handlers.c
     src/cfe_psp_exception_api_stubs.c
+    src/cfe_psp_exceptionstorage_api_stubs.c
     src/cfe_psp_globaldata_stubs.c
     src/cfe_psp_id_api_handlers.c
     src/cfe_psp_id_api_stubs.c
     src/cfe_psp_memaccess_api_stubs.c
+    src/cfe_psp_memory_stubs.c
     src/cfe_psp_memrange_api_handlers.c
     src/cfe_psp_memrange_api_stubs.c
+    src/cfe_psp_module_stubs.c
     src/cfe_psp_port_api_stubs.c
     src/cfe_psp_ssr_api_stubs.c
     src/cfe_psp_stubs.c

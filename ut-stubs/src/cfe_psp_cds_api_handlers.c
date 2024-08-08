@@ -37,11 +37,9 @@
 
 #include "target_config.h"
 
-
 /*
 ** Functions
 */
-
 
 /*****************************************************************************/
 /**
@@ -62,8 +60,8 @@ void UT_DefaultHandler_CFE_PSP_WriteToCDS(void *UserObj, UT_EntryKey_t FuncKey, 
 {
     /* int32 CFE_PSP_WriteToCDS(const void *PtrToDataToWrite, uint32 CDSOffset, uint32 NumBytes) */
     const void *PtrToDataToWrite = UT_Hook_GetArgValueByName(Context, "PtrToDataToWrite", const void *);
-    uint32 CDSOffset = UT_Hook_GetArgValueByName(Context, "CDSOffset", uint32 );
-    uint32 NumBytes = UT_Hook_GetArgValueByName(Context, "NumBytes", uint32 );
+    uint32      CDSOffset        = UT_Hook_GetArgValueByName(Context, "CDSOffset", uint32);
+    uint32      NumBytes         = UT_Hook_GetArgValueByName(Context, "NumBytes", uint32);
 
     uint8 *BufPtr;
     size_t CdsSize;
@@ -100,9 +98,9 @@ void UT_DefaultHandler_CFE_PSP_WriteToCDS(void *UserObj, UT_EntryKey_t FuncKey, 
 void UT_DefaultHandler_CFE_PSP_ReadFromCDS(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     /* int32 CFE_PSP_ReadFromCDS(void *PtrToDataToRead, uint32 CDSOffset, uint32 NumBytes) */
-    void *PtrToDataToRead = UT_Hook_GetArgValueByName(Context, "PtrToDataToRead", void *);
-    uint32 CDSOffset = UT_Hook_GetArgValueByName(Context, "CDSOffset", uint32 );
-    uint32 NumBytes = UT_Hook_GetArgValueByName(Context, "NumBytes", uint32 );
+    void * PtrToDataToRead = UT_Hook_GetArgValueByName(Context, "PtrToDataToRead", void *);
+    uint32 CDSOffset       = UT_Hook_GetArgValueByName(Context, "CDSOffset", uint32);
+    uint32 NumBytes        = UT_Hook_GetArgValueByName(Context, "NumBytes", uint32);
 
     uint8 *BufPtr;
     size_t CdsSize;

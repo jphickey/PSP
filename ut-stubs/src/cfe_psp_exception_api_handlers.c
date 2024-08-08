@@ -37,11 +37,11 @@
 
 #include "target_config.h"
 
-
-
-void UT_DefaultHandler_CFE_PSP_Exception_GetSummary(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CFE_PSP_Exception_GetSummary(void *UserObj, UT_EntryKey_t FuncKey,
+                                                    const UT_StubContext_t *Context)
 {
-    /* int32 CFE_PSP_Exception_GetSummary(uint32 *ContextLogId, osal_id_t *TaskId, char *ReasonBuf, uint32 ReasonSize) */
+    /* int32 CFE_PSP_Exception_GetSummary(uint32 *ContextLogId, osal_id_t *TaskId, char *ReasonBuf, uint32 ReasonSize)
+     */
     osal_id_t *TaskId = UT_Hook_GetArgValueByName(Context, "TaskId", osal_id_t *);
 
     int32 status;
@@ -54,12 +54,13 @@ void UT_DefaultHandler_CFE_PSP_Exception_GetSummary(void *UserObj, UT_EntryKey_t
     }
 }
 
-void UT_DefaultHandler_CFE_PSP_Exception_CopyContext(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CFE_PSP_Exception_CopyContext(void *UserObj, UT_EntryKey_t FuncKey,
+                                                     const UT_StubContext_t *Context)
 {
     /* int32 CFE_PSP_Exception_CopyContext(uint32 ContextLogId, void *ContextBuf, uint32 ContextSize) */
-    void *ContextBuf = UT_Hook_GetArgValueByName(Context, "ContextBuf", void *);
-    uint32 ContextSize = UT_Hook_GetArgValueByName(Context, "ContextSize", uint32 );
-    int32 status;
+    void * ContextBuf  = UT_Hook_GetArgValueByName(Context, "ContextBuf", void *);
+    uint32 ContextSize = UT_Hook_GetArgValueByName(Context, "ContextSize", uint32);
+    int32  status;
 
     UT_Stub_GetInt32StatusCode(Context, &status);
 
@@ -68,4 +69,3 @@ void UT_DefaultHandler_CFE_PSP_Exception_CopyContext(void *UserObj, UT_EntryKey_
         status = UT_Stub_CopyToLocal(UT_KEY(CFE_PSP_Exception_CopyContext), ContextBuf, ContextSize);
     }
 }
-

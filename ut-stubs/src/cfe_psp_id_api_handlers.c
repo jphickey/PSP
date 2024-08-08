@@ -39,7 +39,7 @@ void UT_DefaultHandler_CFE_PSP_GetProcessorName(void *UserObj, UT_EntryKey_t Fun
 {
     /* const char *CFE_PSP_GetProcessorName(void) */
     static const char default_retval[] = "UT";
-    const char *ptr;
+    const char *      ptr;
 
     int32 status;
 
@@ -55,4 +55,3 @@ void UT_DefaultHandler_CFE_PSP_GetProcessorName(void *UserObj, UT_EntryKey_t Fun
         UT_Stub_SetReturnValue(FuncKey, ptr);
     }
 }
-

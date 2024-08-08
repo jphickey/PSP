@@ -42,8 +42,8 @@
 void UT_DefaultHandler_CFE_PSP_GetTime(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     /* void CFE_PSP_GetTime(OS_time_t *LocalTime) */
-    OS_time_t *LocalTime  = UT_Hook_GetArgValueByName(Context, "LocalTime", OS_time_t *);
-    int32 status;
+    OS_time_t *LocalTime = UT_Hook_GetArgValueByName(Context, "LocalTime", OS_time_t *);
+    int32      status;
 
     UT_Stub_GetInt32StatusCode(Context, &status);
 
@@ -56,7 +56,8 @@ void UT_DefaultHandler_CFE_PSP_GetTime(void *UserObj, UT_EntryKey_t FuncKey, con
     }
 }
 
-void UT_DefaultHandler_CFE_PSP_GetTimerTicksPerSecond(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CFE_PSP_GetTimerTicksPerSecond(void *UserObj, UT_EntryKey_t FuncKey,
+                                                      const UT_StubContext_t *Context)
 {
     /* uint32 CFE_PSP_GetTimerTicksPerSecond(void) */
     uint32 retval;
@@ -67,7 +68,8 @@ void UT_DefaultHandler_CFE_PSP_GetTimerTicksPerSecond(void *UserObj, UT_EntryKey
     }
 }
 
-void UT_DefaultHandler_CFE_PSP_GetTimerLow32Rollover(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CFE_PSP_GetTimerLow32Rollover(void *UserObj, UT_EntryKey_t FuncKey,
+                                                     const UT_StubContext_t *Context)
 {
     /* uint32 CFE_PSP_GetTimerLow32Rollover(void) */
     uint32 retval;

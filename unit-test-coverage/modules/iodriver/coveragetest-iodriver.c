@@ -43,207 +43,238 @@
 #include "cfe_psp_config.h"
 #include "cfe_psp_module.h"
 
-#include "PCS_arch_ppc_vxPpcLib.h"
+#include "iodriver_base.h"
+#include "iodriver_impl.h"
+
+CFE_PSP_IODriver_API_t Ut_NoopAPI = {NULL, NULL};
+
+extern void                    iodriver_Init(uint32 PspModuleId);
+extern CFE_PSP_IODriver_API_t *CFE_PSP_IODriver_GetAPI(uint32 PspModuleId);
+
+static int32 Stub_DeviceCommand(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_PSP_IODriver_Arg_t arg)
+{
+    return UT_DEFAULT_IMPL(Stub_DeviceCommand);
+}
+
+static int32 Stub_DeviceMutex(uint32 CommandCode, uint16 Instance, uint16 SubChannel, CFE_PSP_IODriver_Arg_t arg)
+{
+    return UT_DEFAULT_IMPL(Stub_DeviceMutex);
+}
 
 /*
- * Reference to the API entry point for the module
+ * --------------------------------------------
+ * Instantiation of a Stub IO Driver with no mutex
+ * --------------------------------------------
  */
-extern CFE_PSP_ModuleApi_t CFE_PSP_timebase_vxworks_API;
-
-const CFE_PSP_ModuleApi_t *TgtAPI = &CFE_PSP_timebase_vxworks_API;
-
-UT_PSP_TimeBase_VxWorks_TestConfig_t UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG;
-
-typedef struct
+static void StubNoMut_Init(uint32 ModuleID)
 {
-    uint32 u;
-    uint32 l;
-} PSP_VxWorks_TimeBaseVal_t;
-
-void ModuleTest_ResetState(void)
-{
-    memset(&UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG, 0, sizeof(UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG));
+    UT_DEFAULT_IMPL(StubNoMut_Init);
 }
 
-int32 UTHOOK_vxTimeBaseGet(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context)
+static CFE_PSP_IODriver_API_t StubNoMut_DevApi = {.DeviceCommand = Stub_DeviceCommand};
+
+CFE_PSP_MODULE_DECLARE_IODEVICEDRIVER(StubNoMut);
+
+/*
+ * --------------------------------------------
+ * Instantiation of a Stub IO Driver with mutex
+ * --------------------------------------------
+ */
+static void StubWithMut_Init(uint32 ModuleID)
 {
-    PSP_VxWorks_TimeBaseVal_t *val = UserObj;
-    uint32 *                   u   = UT_Hook_GetArgValueByName(Context, "u", uint32 *);
-    uint32 *                   l   = UT_Hook_GetArgValueByName(Context, "l", uint32 *);
-
-    *u = val->u;
-    *l = val->l;
-
-    return StubRetcode;
+    UT_DEFAULT_IMPL(StubWithMut_Init);
 }
 
-void Test_Nominal(void)
+static CFE_PSP_IODriver_API_t StubWithMut_DevApi = {.DeviceCommand = Stub_DeviceCommand,
+                                                    .DeviceMutex   = Stub_DeviceMutex};
+
+CFE_PSP_MODULE_DECLARE_IODEVICEDRIVER(StubWithMut);
+
+/*
+ * --------------------------------------------
+ * HANDLER FUNCTIONS -- helpers for stubs
+ * --------------------------------------------
+ */
+
+static void UtHandler_CFE_PSP_Module_GetAPIEntry(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
-    OS_time_t                 OsTime;
-    PSP_VxWorks_TimeBaseVal_t VxTime;
-
-    memset(&OsTime, 0, sizeof(OsTime));
-
-    /* Nominal test with a simple 1:1 ratio */
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodNumerator   = 1;
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodDenominator = 1;
-    TgtAPI->Init(0);
-    UtAssert_UINT32_EQ(CFE_PSP_GetTimerTicksPerSecond(), 1000000000);
-
-    /* Check operation of CFE_PSP_GetTime() */
-    UT_SetHookFunction(UT_KEY(PCS_vxTimeBaseGet), UTHOOK_vxTimeBaseGet, &VxTime);
-    VxTime.u = 0;
-    VxTime.l = 10000;
-    CFE_PSP_GetTime(&OsTime);
-
-    UtAssert_UINT32_EQ(OS_TimeGetNanosecondsPart(OsTime), 10000);
-}
-
-void Test_Non_Reducible(void)
-{
-    OS_time_t                 OsTime;
-    PSP_VxWorks_TimeBaseVal_t VxTime;
-    int64                     TestTime;
-
-    memset(&OsTime, 0, sizeof(OsTime));
-
-    /* Use an oddball ratio of of some primes, will not be reducible */
-    /* Ratio is 43*3 / 53*2  => 129/106 */
-    /* This translates to about ~1.217ns per tick */
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodNumerator   = 43 * 3;
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodDenominator = 53 * 2;
-    TgtAPI->Init(0);
-    UtAssert_UINT32_EQ(CFE_PSP_GetTimerTicksPerSecond(), 821705426);
-
-    /*
-     * Check operation of CFE_PSP_GetTime()
-     *
-     * This test requires that the conversion uses the actual ratio,
-     * otherwise a rounding error will be noticed.
-     * For example:
-     * Conversion using 1.217ns/tick yields 52269758 usec (wrong).
-     * Conversion using actual ratio yields 52268947 usec.
+    /* Handler for:
+     * int32 CFE_PSP_Module_GetAPIEntry(uint32 PspModuleId, CFE_PSP_ModuleApi_t **API);
      */
 
-    UT_SetHookFunction(UT_KEY(PCS_vxTimeBaseGet), UTHOOK_vxTimeBaseGet, &VxTime);
-    VxTime.u = 10;
-    VxTime.l = 5000;
-    CFE_PSP_GetTime(&OsTime);
+    CFE_PSP_ModuleApi_t **API = UT_Hook_GetArgValueByName(Context, "API", CFE_PSP_ModuleApi_t **);
+    int32                 status;
 
-    TestTime = OS_TimeGetTotalMicroseconds(OsTime);
-    UtAssert_True(TestTime == 52268947, "CFE_PSP_GetTime() Microseconds (%lld) == 52268947", (long long)TestTime);
+    /* This needs to output a proper value */
+    UT_Stub_GetInt32StatusCode(Context, &status);
+    if (status >= 0)
+    {
+        *API = UserObj;
+    }
+    else
+    {
+        *API = NULL;
+    }
 }
 
-void Test_Reducible_1(void)
+static void UtHandler_CFE_PSP_Module_FindByName(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
-    OS_time_t                 OsTime;
-    PSP_VxWorks_TimeBaseVal_t VxTime;
-    int64                     TestTime;
+    /* Handler for:
+     * int32 CFE_PSP_Module_FindByName(const char *ModuleName, uint32 *PspModuleId);
+     */
+    uint32 *PspModuleId = UT_Hook_GetArgValueByName(Context, "PspModuleId", uint32 *);
+    int32   status;
 
-    memset(&OsTime, 0, sizeof(OsTime));
+    /* This needs to output a proper value */
+    UT_Stub_GetInt32StatusCode(Context, &status);
+    if (status >= 0 && UserObj != NULL)
+    {
+        *PspModuleId = *((uint32 *)UserObj);
+    }
+    else
+    {
+        *PspModuleId = 0;
+    }
+}
 
-    /* Test with a ratio that is also 1:1, but can be reduced */
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodNumerator   = 1000;
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodDenominator = 1000;
-    TgtAPI->Init(0);
-    UtAssert_UINT32_EQ(CFE_PSP_GetTimerTicksPerSecond(), 1000000000);
+/*
+ * --------------------------------------------
+ * TEST FUNCTIONS
+ * --------------------------------------------
+ */
+
+void Test_iodriver_Init(void)
+{
+    /* Test For:
+     * void iodriver_Init(uint32 PspModuleId)
+     */
+    UtAssert_VOIDCALL(iodriver_Init(1));
+}
+
+void Test_CFE_PSP_IODriver_GetAPI(void)
+{
+    /* Test For:
+     * CFE_PSP_IODriver_API_t *CFE_PSP_IODriver_GetAPI(uint32 PspModuleId)
+     */
+    CFE_PSP_IODriver_API_t *ApiPtr;
+
+    /* Requesting a nonexistent module should return a default API */
+    UtAssert_NOT_NULL(ApiPtr = CFE_PSP_IODriver_GetAPI(0));
+    UtAssert_BOOL_TRUE(ApiPtr->DeviceCommand == NULL);
+    UtAssert_BOOL_TRUE(ApiPtr->DeviceMutex == NULL);
+
+    UT_SetDefaultReturnValue(UT_KEY(CFE_PSP_Module_GetAPIEntry), -1);
+    UtAssert_NOT_NULL(ApiPtr = CFE_PSP_IODriver_GetAPI(0));
+    UtAssert_BOOL_TRUE(ApiPtr->DeviceCommand == NULL);
+    UtAssert_BOOL_TRUE(ApiPtr->DeviceMutex == NULL);
+
+    UT_ResetState(UT_KEY(CFE_PSP_Module_GetAPIEntry));
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_GetAPIEntry), UtHandler_CFE_PSP_Module_GetAPIEntry,
+                          (void *)&CFE_PSP_StubNoMut_API);
+    UtAssert_NOT_NULL(ApiPtr = CFE_PSP_IODriver_GetAPI(0));
+    UtAssert_BOOL_TRUE(ApiPtr->DeviceCommand == Stub_DeviceCommand);
+}
+
+void Test_CFE_PSP_IODriver_GetMutex(void)
+{
+    /* Test For:
+     * osal_id_t CFE_PSP_IODriver_GetMutex(uint32 PspModuleId, int32 DeviceHash)
+     */
+    UtAssert_BOOL_TRUE(OS_ObjectIdDefined(CFE_PSP_IODriver_GetMutex(1, 2)));
+    UtAssert_BOOL_TRUE(OS_ObjectIdDefined(CFE_PSP_IODriver_GetMutex(0, 4)));
+    UtAssert_BOOL_FALSE(OS_ObjectIdDefined(CFE_PSP_IODriver_GetMutex(1, -1)));
+}
+
+void Test_CFE_PSP_IODriver_HashMutex(void)
+{
+    /* Test For:
+     * int32 CFE_PSP_IODriver_HashMutex(int32 StartHash, int32 Datum)
+     */
 
     /*
-     * Check operation of CFE_PSP_GetTime()
-     *
-     * Externally calculated value should be 10376293541461622 usec.
-     * If overflow occurs then value will be wrong.
+     * This is a basic hash function and should modify the value, but do
+     * so in a way that makes a pseudo-random result.  It is not the intent
+     * to "check" the result here because that would simply be implementing
+     * the algoritm in reverse.  All this will confirm is the output value is
+     * different than the input (StartHash).  There are no branches in this
+     * routine, it is just a numeric calculation.
      */
-    UT_SetHookFunction(UT_KEY(PCS_vxTimeBaseGet), UTHOOK_vxTimeBaseGet, &VxTime);
-    VxTime.u = 0x90000000; /* nearing 64-bit limit */
-    VxTime.l = 0;
-    CFE_PSP_GetTime(&OsTime);
-
-    TestTime = OS_TimeGetTotalMicroseconds(OsTime);
-    UtAssert_True(TestTime == 10376293541461622, "CFE_PSP_GetTime() Microseconds (%lld) == 10376293541461622",
-                  (long long)TestTime);
+    UtAssert_INT32_NEQ(CFE_PSP_IODriver_HashMutex(1, 2), 1);
+    UtAssert_INT32_NEQ(CFE_PSP_IODriver_HashMutex(2, 3), 2);
 }
 
-void Test_Reducible_2(void)
+void Test_CFE_PSP_IODriver_Command(void)
 {
-    OS_time_t                 OsTime;
-    PSP_VxWorks_TimeBaseVal_t VxTime;
-    int64                     TestTime;
-
-    memset(&OsTime, 0, sizeof(OsTime));
-
-    /* Test with a ratio that can be reduced */
-    /* Final reduced ratio should be 12:5 with 100ns OS ticks */
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodNumerator   = 84000;
-    UT_PSP_TIMEBASE_VXWORKS_TESTCONFIG.PeriodDenominator = 350;
-    TgtAPI->Init(0);
-    UtAssert_UINT32_EQ(CFE_PSP_GetTimerTicksPerSecond(), 4166666);
-
-    /*
-     * Check operation of CFE_PSP_GetTime()
-     *
-     * Externally calculated value should be 276701161105643274 usec.
-     * If overflow occurs then value will be wrong.
+    /* Test For:
+     * int32 CFE_PSP_IODriver_Command(const CFE_PSP_IODriver_Location_t *Location, uint32 CommandCode,
+     * CFE_PSP_IODriver_Arg_t Arg)
      */
-    UT_SetHookFunction(UT_KEY(PCS_vxTimeBaseGet), UTHOOK_vxTimeBaseGet, &VxTime);
-    VxTime.u = 0x10000000; /* nearing 64-bit limit */
-    VxTime.l = 0;
-    CFE_PSP_GetTime(&OsTime);
+    const CFE_PSP_IODriver_Location_t UtLocation = {1, 1, 1};
 
-    TestTime = OS_TimeGetTotalMicroseconds(OsTime);
-    UtAssert_True(TestTime == 276701161105643274, "CFE_PSP_GetTime() Microseconds(%lld) == 276701161105643274",
-                  (long long)TestTime);
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_GetAPIEntry), UtHandler_CFE_PSP_Module_GetAPIEntry,
+                          (void *)&Ut_NoopAPI);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_Command(&UtLocation, 1, CFE_PSP_IODriver_U32ARG(0)),
+                      CFE_PSP_ERROR_NOT_IMPLEMENTED);
+
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_GetAPIEntry), UtHandler_CFE_PSP_Module_GetAPIEntry,
+                          (void *)&CFE_PSP_StubNoMut_API);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_Command(&UtLocation, 1, CFE_PSP_IODriver_U32ARG(0)), CFE_PSP_SUCCESS);
+    UtAssert_STUB_COUNT(Stub_DeviceCommand, 1);
+    UtAssert_STUB_COUNT(Stub_DeviceMutex, 0);
+
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_GetAPIEntry), UtHandler_CFE_PSP_Module_GetAPIEntry,
+                          (void *)&CFE_PSP_StubWithMut_API);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_Command(&UtLocation, 1, CFE_PSP_IODriver_U32ARG(0)), CFE_PSP_SUCCESS);
+    UtAssert_STUB_COUNT(Stub_DeviceCommand, 2);
+    UtAssert_STUB_COUNT(Stub_DeviceMutex, 1);
 }
 
-void Test_Rollover(void)
+void Test_CFE_PSP_IODriver_FindByName(void)
 {
-    /* This function always returns 0 */
-    UtAssert_UINT32_EQ(CFE_PSP_GetTimerLow32Rollover(), 0);
-}
+    /* Test For:
+     * int32 CFE_PSP_IODriver_FindByName(const char *DriverName, uint32 *PspModuleId)
+     */
+    uint32 ModuleID = 0;
+    uint32 CheckID  = 1234;
 
-/******************************************************************************
-**
-**  Purpose:
-**    Provides a common interface to system timebase. This routine
-**    is in the BSP because it is sometimes implemented in hardware and
-**    sometimes taken care of by the RTOS.
-**
-**  Arguments:
-**
-**  Return:
-**  Timebase register value
-*/
-void Test_Get_Timebase(void)
-{
-    PSP_VxWorks_TimeBaseVal_t VxTime;
-    uint32                    tbu;
-    uint32                    tbl;
+    UT_SetDefaultReturnValue(UT_KEY(CFE_PSP_Module_FindByName), -100);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_FindByName("UT", &ModuleID), -100);
+    UT_ResetState(UT_KEY(CFE_PSP_Module_FindByName));
 
-    /* The value from vxTimeBaseGet() should be passed through unchanged */
-    UT_SetHookFunction(UT_KEY(PCS_vxTimeBaseGet), UTHOOK_vxTimeBaseGet, &VxTime);
-    VxTime.u = 0x00112233;
-    VxTime.l = 0x44556677;
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_FindByName), UtHandler_CFE_PSP_Module_FindByName, &CheckID);
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_GetAPIEntry), UtHandler_CFE_PSP_Module_GetAPIEntry,
+                          (void *)&Ut_NoopAPI);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_FindByName("UT", &ModuleID), CFE_PSP_INVALID_MODULE_NAME);
 
-    CFE_PSP_Get_Timebase(&tbu, &tbl);
+    UT_SetHandlerFunction(UT_KEY(CFE_PSP_Module_GetAPIEntry), UtHandler_CFE_PSP_Module_GetAPIEntry,
+                          (void *)&CFE_PSP_StubWithMut_API);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_FindByName("UT", &ModuleID), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(ModuleID, CheckID);
 
-    UtAssert_UINT32_EQ(tbu, VxTime.u);
-    UtAssert_UINT32_EQ(tbl, VxTime.l);
+    UT_ResetState(UT_KEY(CFE_PSP_Module_GetAPIEntry));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_PSP_Module_GetAPIEntry), -101);
+    UtAssert_INT32_EQ(CFE_PSP_IODriver_FindByName("UT", &ModuleID), -101);
 }
 
 /*
  * Macro to add a test case to the list of tests to execute
  */
-#define ADD_TEST(test) UtTest_Add(test, ModuleTest_ResetState, NULL, #test)
+#define ADD_TEST(test) UtTest_Add(test, ResetTest, NULL, #test)
+
+void ResetTest(void)
+{
+    UT_ResetState(0);
+}
 
 /*
  * Register the test cases to execute with the unit test tool
  */
 void UtTest_Setup(void)
 {
-    ADD_TEST(Test_Nominal);
-    ADD_TEST(Test_Non_Reducible);
-    ADD_TEST(Test_Reducible_1);
-    ADD_TEST(Test_Reducible_2);
-    ADD_TEST(Test_Rollover);
-    ADD_TEST(Test_Get_Timebase);
+    ADD_TEST(Test_iodriver_Init);
+    ADD_TEST(Test_CFE_PSP_IODriver_GetAPI);
+    ADD_TEST(Test_CFE_PSP_IODriver_GetMutex);
+    ADD_TEST(Test_CFE_PSP_IODriver_HashMutex);
+    ADD_TEST(Test_CFE_PSP_IODriver_Command);
+    ADD_TEST(Test_CFE_PSP_IODriver_FindByName);
 }

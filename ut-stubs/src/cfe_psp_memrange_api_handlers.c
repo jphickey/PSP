@@ -35,7 +35,6 @@
 #include "utstubs.h"
 #include <string.h>
 
-
 /*
 ** Functions
 */
@@ -44,7 +43,7 @@ void UT_DefaultHandler_CFE_PSP_GetResetArea(void *UserObj, UT_EntryKey_t FuncKey
 {
     /* int32 CFE_PSP_GetResetArea() */
     cpuaddr *PtrToResetArea  = UT_Hook_GetArgValueByName(Context, "PtrToResetArea", cpuaddr *);
-    uint32 *SizeOfResetArea  = UT_Hook_GetArgValueByName(Context, "SizeOfResetArea", uint32 *);
+    uint32 * SizeOfResetArea = UT_Hook_GetArgValueByName(Context, "SizeOfResetArea", uint32 *);
 
     int32  status;
     size_t TempSize;
@@ -65,7 +64,7 @@ void UT_DefaultHandler_CFE_PSP_GetVolatileDiskMem(void *UserObj, UT_EntryKey_t F
 {
     /* int32 CFE_PSP_GetVolatileDiskMem() */
     cpuaddr *PtrToVolDisk  = UT_Hook_GetArgValueByName(Context, "PtrToVolDisk", cpuaddr *);
-    uint32 *SizeOfVolDisk  = UT_Hook_GetArgValueByName(Context, "SizeOfVolDisk", uint32 *);
+    uint32 * SizeOfVolDisk = UT_Hook_GetArgValueByName(Context, "SizeOfVolDisk", uint32 *);
 
     int32  status;
     size_t TempSize;
@@ -82,11 +81,12 @@ void UT_DefaultHandler_CFE_PSP_GetVolatileDiskMem(void *UserObj, UT_EntryKey_t F
     }
 }
 
-void UT_DefaultHandler_CFE_PSP_GetCFETextSegmentInfo(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CFE_PSP_GetCFETextSegmentInfo(void *UserObj, UT_EntryKey_t FuncKey,
+                                                     const UT_StubContext_t *Context)
 {
     /* int32 CFE_PSP_GetCFETextSegmentInfo() */
     cpuaddr *PtrToCFESegment  = UT_Hook_GetArgValueByName(Context, "PtrToCFESegment", cpuaddr *);
-    uint32 *SizeOfCFESegment  = UT_Hook_GetArgValueByName(Context, "SizeOfCFESegment", uint32 *);
+    uint32 * SizeOfCFESegment = UT_Hook_GetArgValueByName(Context, "SizeOfCFESegment", uint32 *);
 
     static uint32 LocalTextSegment;
     int32         status;
@@ -112,11 +112,12 @@ void UT_DefaultHandler_CFE_PSP_GetCFETextSegmentInfo(void *UserObj, UT_EntryKey_
     }
 }
 
-void UT_DefaultHandler_CFE_PSP_GetKernelTextSegmentInfo(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CFE_PSP_GetKernelTextSegmentInfo(void *UserObj, UT_EntryKey_t FuncKey,
+                                                        const UT_StubContext_t *Context)
 {
     /* int32 CFE_PSP_GetKernelTextSegmentInfo(cpuaddr *PtrToKernelSegment, uint32 *SizeOfKernelSegment) */
     cpuaddr *PtrToKernelSegment  = UT_Hook_GetArgValueByName(Context, "PtrToKernelSegment", cpuaddr *);
-    uint32 *SizeOfKernelSegment  = UT_Hook_GetArgValueByName(Context, "SizeOfKernelSegment", uint32 *);
+    uint32 * SizeOfKernelSegment = UT_Hook_GetArgValueByName(Context, "SizeOfKernelSegment", uint32 *);
 
     static uint32 LocalTextSegment;
     int32         status;
