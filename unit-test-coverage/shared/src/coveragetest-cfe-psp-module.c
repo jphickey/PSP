@@ -30,41 +30,49 @@
 
 /**
  * \file
- * \ingroup  vxworks
- * \author   joseph.p.hickey@nasa.gov
- *
+ * \ingroup  shared
  */
 
-#ifndef COVERAGETEST_PSP_SHARED_H
-#define COVERAGETEST_PSP_SHARED_H
-
 #include "utassert.h"
-#include "uttest.h"
 #include "utstubs.h"
 
-void Test_CFE_PSP_StatusToString(void);
+#include "cfe_psp_module.h"
 
-void Test_CFE_PSP_GetVersionString(void);
-void Test_CFE_PSP_GetVersionCodeName(void);
-void Test_CFE_PSP_GetVersionNumber(void);
-void Test_CFE_PSP_GetBuildNumber(void);
+extern uint32_t CFE_PSP_ModuleInitList(uint32 BaseId, CFE_StaticModuleLoadEntry_t *ListPtr);
 
-void Test_CFE_PSP_Exception_GetBuffer(void);
-void Test_CFE_PSP_Exception_GetNextContextBuffer(void);
-void Test_CFE_PSP_Exception_GetSummary(void);
-void Test_CFE_PSP_Exception_CopyContext(void);
+void Test_CFE_PSP_ModuleInitList(void)
+{
+    /* Test Case for:
+     * uint32_t CFE_PSP_ModuleInitList(uint32 BaseId, CFE_StaticModuleLoadEntry_t *ListPtr)
+     */
+    CFE_StaticModuleLoadEntry_t ListPtr[1] = {{0}};
 
-void Test_CFE_PSP_ModuleInitList(void);
-void Test_CFE_PSP_ModuleInit(void);
-void Test_CFE_PSP_Module_GetAPIEntry(void);
-void Test_CFE_PSP_Module_FindByName(void);
+    UtAssert_UINT32_EQ(CFE_PSP_ModuleInitList(1, ListPtr), 0);
+}
 
-void Test_CFE_PSP_MemCpy(void);
-void Test_CFE_PSP_MemSet(void);
+void Test_CFE_PSP_ModuleInit(void)
+{
+    /* Test Case for:
+     * void CFE_PSP_ModuleInit(void)
+     */
+    UtAssert_VOIDCALL(CFE_PSP_ModuleInit());
+}
 
-void Test_CFE_PSP_MemValidateRange(void);
-void Test_CFE_PSP_MemRanges(void);
-void Test_CFE_PSP_MemRangeSet(void);
-void Test_CFE_PSP_MemRangeGet(void);
+void Test_CFE_PSP_Module_GetAPIEntry(void)
+{
+    /* Test Case for:
+     * int32 CFE_PSP_Module_GetAPIEntry(uint32 PspModuleId, CFE_PSP_ModuleApi_t **API)
+     */
+    CFE_PSP_ModuleApi_t *API;
 
-#endif
+    UtAssert_INT32_EQ(CFE_PSP_Module_GetAPIEntry(0, &API), CFE_PSP_INVALID_MODULE_ID);
+}
+
+void Test_CFE_PSP_Module_FindByName(void)
+{
+    /* Test Case for:
+     * int32 CFE_PSP_Module_FindByName(const char *ModuleName, uint32 *PspModuleId)
+     */
+    uint32 ModuleId;
+    UtAssert_INT32_EQ(CFE_PSP_Module_FindByName("UT", &ModuleId), CFE_PSP_INVALID_MODULE_NAME);
+}

@@ -35,63 +35,28 @@
  *
  */
 
-#include "coveragetest-psp-mcp750-vxworks.h"
+#include "utassert.h"
+#include "utstubs.h"
 
-/* Psp_Test_Setup
- *
- * Purpose:
- *   Called by the unit test tool to set up the app prior to each test
- */
-void Psp_Test_Setup(void)
+#include "cfe_psp_memaccess_api.h"
+
+void Test_CFE_PSP_MemCpy(void)
 {
-    UT_ResetState(0);
+    /* Test Case For:
+     * int32 CFE_PSP_MemCpy(void *dest, const void *src, uint32 n)
+     */
+    const uint8 MySrcBuf[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+    uint8       MyDstBuf[16];
+
+    UtAssert_INT32_EQ(CFE_PSP_MemCpy(MyDstBuf, MySrcBuf, sizeof(MyDstBuf)), CFE_PSP_SUCCESS);
 }
 
-/*
- * Test_Teardown
- *
- * Purpose:
- *   Called by the unit test tool to tear down the app after each test
- */
-void Psp_Test_Teardown(void) {}
-
-/* UtTest_Setup
- *
- * Purpose:
- *   Registers the test cases to execute with the unit test tool
- */
-void UtTest_Setup(void)
+void Test_CFE_PSP_MemSet(void)
 {
-    ADD_TEST(OS_Application_Run);
-    ADD_TEST(OS_Application_Startup);
+    /* Test Case For:
+     * int32 CFE_PSP_MemSet(void *dest, uint8 value, uint32 n)
+     */
+    uint8 MyBuf[16];
 
-    ADD_TEST(CFE_PSP_Restart);
-    ADD_TEST(CFE_PSP_Panic);
-    ADD_TEST(CFE_PSP_FlushCaches);
-    ADD_TEST(CFE_PSP_GetProcessorId);
-    ADD_TEST(CFE_PSP_GetSpacecraftId);
-
-    ADD_TEST(CFE_PSP_Exception_GetBuffer);
-    ADD_TEST(CFE_PSP_Exception_GetNextContextBuffer);
-    ADD_TEST(CFE_PSP_Exception_GetSummary);
-    ADD_TEST(CFE_PSP_Exception_CopyContext);
-
-    ADD_TEST(CFE_PSP_StatusToString);
-    ADD_TEST(CFE_PSP_GetVersionString);
-    ADD_TEST(CFE_PSP_GetVersionCodeName);
-    ADD_TEST(CFE_PSP_GetVersionNumber);
-    ADD_TEST(CFE_PSP_GetBuildNumber);
-
-    ADD_TEST(CFE_PSP_ModuleInitList);
-    ADD_TEST(CFE_PSP_ModuleInit);
-    ADD_TEST(CFE_PSP_Module_GetAPIEntry);
-    ADD_TEST(CFE_PSP_Module_FindByName);
-
-    ADD_TEST(CFE_PSP_MemCpy);
-    ADD_TEST(CFE_PSP_MemSet);
-
-    ADD_TEST(CFE_PSP_MemValidateRange);
-    ADD_TEST(CFE_PSP_MemRanges);
-    ADD_TEST(CFE_PSP_MemRangeSet);
-    ADD_TEST(CFE_PSP_MemRangeGet);
+    UtAssert_INT32_EQ(CFE_PSP_MemSet(MyBuf, 0x82, sizeof(MyBuf)), CFE_PSP_SUCCESS);
 }

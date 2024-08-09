@@ -31,40 +31,49 @@
 /**
  * \file
  * \ingroup  vxworks
- * \author   joseph.p.hickey@nasa.gov
- *
  */
 
-#ifndef COVERAGETEST_PSP_SHARED_H
-#define COVERAGETEST_PSP_SHARED_H
-
 #include "utassert.h"
-#include "uttest.h"
 #include "utstubs.h"
 
-void Test_CFE_PSP_StatusToString(void);
+#include "cfe_psp_memrange_api.h"
 
-void Test_CFE_PSP_GetVersionString(void);
-void Test_CFE_PSP_GetVersionCodeName(void);
-void Test_CFE_PSP_GetVersionNumber(void);
-void Test_CFE_PSP_GetBuildNumber(void);
+void Test_CFE_PSP_MemValidateRange(void)
+{
+    /* Test Case For:
+     * int32 CFE_PSP_MemValidateRange(cpuaddr Address, size_t Size, uint32 MemoryType)
+     */
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, CFE_PSP_MEM_RAM), CFE_PSP_SUCCESS);
+}
 
-void Test_CFE_PSP_Exception_GetBuffer(void);
-void Test_CFE_PSP_Exception_GetNextContextBuffer(void);
-void Test_CFE_PSP_Exception_GetSummary(void);
-void Test_CFE_PSP_Exception_CopyContext(void);
+void Test_CFE_PSP_MemRanges(void)
+{
+    /* Test Case For:
+     * uint32 CFE_PSP_MemRanges(void)
+     */
+    UtAssert_NONZERO(CFE_PSP_MemRanges());
+}
 
-void Test_CFE_PSP_ModuleInitList(void);
-void Test_CFE_PSP_ModuleInit(void);
-void Test_CFE_PSP_Module_GetAPIEntry(void);
-void Test_CFE_PSP_Module_FindByName(void);
+void Test_CFE_PSP_MemRangeSet(void)
+{
+    /* Test Case For:
+     * int32 CFE_PSP_MemRangeSet(uint32 RangeNum, uint32 MemoryType, cpuaddr StartAddr, size_t Size, size_t WordSize,
+     * uint32 Attributes)
+     */
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 4, 0), CFE_PSP_INVALID_MEM_ATTR);
+}
 
-void Test_CFE_PSP_MemCpy(void);
-void Test_CFE_PSP_MemSet(void);
+void Test_CFE_PSP_MemRangeGet(void)
+{
+    /* Test Case For:
+     * int32 CFE_PSP_MemRangeGet(uint32 RangeNum, uint32 *MemoryType, cpuaddr *StartAddr, size_t *Size, size_t
+     * *WordSize, uint32 *Attributes)
+     */
+    uint32  MemType;
+    cpuaddr StartAddr;
+    size_t  MemSize;
+    size_t  WordSize;
+    uint32  Attribs;
 
-void Test_CFE_PSP_MemValidateRange(void);
-void Test_CFE_PSP_MemRanges(void);
-void Test_CFE_PSP_MemRangeSet(void);
-void Test_CFE_PSP_MemRangeGet(void);
-
-#endif
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, &MemType, &StartAddr, &MemSize, &WordSize, &Attribs), CFE_PSP_SUCCESS);
+}

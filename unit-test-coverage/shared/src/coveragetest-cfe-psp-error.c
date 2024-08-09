@@ -35,63 +35,18 @@
  *
  */
 
-#include "coveragetest-psp-mcp750-vxworks.h"
+#include "utassert.h"
+#include "utstubs.h"
 
-/* Psp_Test_Setup
- *
- * Purpose:
- *   Called by the unit test tool to set up the app prior to each test
- */
-void Psp_Test_Setup(void)
+#include "cfe_psp_error.h"
+
+void Test_CFE_PSP_StatusToString(void)
 {
-    UT_ResetState(0);
-}
+    /* Test Case for:
+     * char *CFE_PSP_StatusToString(CFE_PSP_Status_t status, CFE_PSP_StatusString_t *status_string)
+     */
+    CFE_PSP_StatusString_t MyString = {0};
 
-/*
- * Test_Teardown
- *
- * Purpose:
- *   Called by the unit test tool to tear down the app after each test
- */
-void Psp_Test_Teardown(void) {}
-
-/* UtTest_Setup
- *
- * Purpose:
- *   Registers the test cases to execute with the unit test tool
- */
-void UtTest_Setup(void)
-{
-    ADD_TEST(OS_Application_Run);
-    ADD_TEST(OS_Application_Startup);
-
-    ADD_TEST(CFE_PSP_Restart);
-    ADD_TEST(CFE_PSP_Panic);
-    ADD_TEST(CFE_PSP_FlushCaches);
-    ADD_TEST(CFE_PSP_GetProcessorId);
-    ADD_TEST(CFE_PSP_GetSpacecraftId);
-
-    ADD_TEST(CFE_PSP_Exception_GetBuffer);
-    ADD_TEST(CFE_PSP_Exception_GetNextContextBuffer);
-    ADD_TEST(CFE_PSP_Exception_GetSummary);
-    ADD_TEST(CFE_PSP_Exception_CopyContext);
-
-    ADD_TEST(CFE_PSP_StatusToString);
-    ADD_TEST(CFE_PSP_GetVersionString);
-    ADD_TEST(CFE_PSP_GetVersionCodeName);
-    ADD_TEST(CFE_PSP_GetVersionNumber);
-    ADD_TEST(CFE_PSP_GetBuildNumber);
-
-    ADD_TEST(CFE_PSP_ModuleInitList);
-    ADD_TEST(CFE_PSP_ModuleInit);
-    ADD_TEST(CFE_PSP_Module_GetAPIEntry);
-    ADD_TEST(CFE_PSP_Module_FindByName);
-
-    ADD_TEST(CFE_PSP_MemCpy);
-    ADD_TEST(CFE_PSP_MemSet);
-
-    ADD_TEST(CFE_PSP_MemValidateRange);
-    ADD_TEST(CFE_PSP_MemRanges);
-    ADD_TEST(CFE_PSP_MemRangeSet);
-    ADD_TEST(CFE_PSP_MemRangeGet);
+    UtAssert_ADDRESS_EQ(CFE_PSP_StatusToString(CFE_PSP_STATUS_C(-1), &MyString), MyString);
+    UtAssert_NONZERO(MyString[0]);
 }

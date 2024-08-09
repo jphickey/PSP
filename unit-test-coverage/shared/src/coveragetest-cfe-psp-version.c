@@ -30,41 +30,50 @@
 
 /**
  * \file
- * \ingroup  vxworks
- * \author   joseph.p.hickey@nasa.gov
- *
+ * \ingroup  shared
  */
 
-#ifndef COVERAGETEST_PSP_SHARED_H
-#define COVERAGETEST_PSP_SHARED_H
-
 #include "utassert.h"
-#include "uttest.h"
 #include "utstubs.h"
 
-void Test_CFE_PSP_StatusToString(void);
+#include "cfe_psp_version_api.h"
 
-void Test_CFE_PSP_GetVersionString(void);
-void Test_CFE_PSP_GetVersionCodeName(void);
-void Test_CFE_PSP_GetVersionNumber(void);
-void Test_CFE_PSP_GetBuildNumber(void);
+void Test_CFE_PSP_GetVersionString(void)
+{
+    /* Test Case For:
+     * const char *CFE_PSP_GetVersionString(void)
+     */
 
-void Test_CFE_PSP_Exception_GetBuffer(void);
-void Test_CFE_PSP_Exception_GetNextContextBuffer(void);
-void Test_CFE_PSP_Exception_GetSummary(void);
-void Test_CFE_PSP_Exception_CopyContext(void);
+    UtAssert_NOT_NULL(CFE_PSP_GetVersionString());
+}
 
-void Test_CFE_PSP_ModuleInitList(void);
-void Test_CFE_PSP_ModuleInit(void);
-void Test_CFE_PSP_Module_GetAPIEntry(void);
-void Test_CFE_PSP_Module_FindByName(void);
+void Test_CFE_PSP_GetVersionCodeName(void)
+{
+    /* Test Case For:
+     * const char *CFE_PSP_GetVersionCodeName(void)
+     */
 
-void Test_CFE_PSP_MemCpy(void);
-void Test_CFE_PSP_MemSet(void);
+    UtAssert_NOT_NULL(CFE_PSP_GetVersionCodeName());
+}
 
-void Test_CFE_PSP_MemValidateRange(void);
-void Test_CFE_PSP_MemRanges(void);
-void Test_CFE_PSP_MemRangeSet(void);
-void Test_CFE_PSP_MemRangeGet(void);
+void Test_CFE_PSP_GetVersionNumber(void)
+{
+    /* Test Case For:
+     * void CFE_PSP_GetVersionNumber(uint8 VersionNumbers[4])
+     */
+    uint8 VersionNumbers[4] = {0, 0, 0, 0};
 
-#endif
+    UtAssert_VOIDCALL(CFE_PSP_GetVersionNumber(VersionNumbers));
+
+    /* Only sanity-check the major version, everything else can be validly zero */
+    UtAssert_NONZERO(VersionNumbers[0]);
+}
+
+void Test_CFE_PSP_GetBuildNumber(void)
+{
+    /* Test Case For:
+     * uint32 CFE_PSP_GetBuildNumber(void)
+     */
+
+    UtAssert_NONZERO(CFE_PSP_GetBuildNumber());
+}
