@@ -122,6 +122,7 @@ void Test_CFE_PSP_PortWrite32(void)
  */
 void UtTest_Setup(void)
 {
+    ADD_TEST(Test_port_notimpl_Init);
     ADD_TEST(Test_CFE_PSP_PortRead8);
     ADD_TEST(Test_CFE_PSP_PortWrite8);
     ADD_TEST(Test_CFE_PSP_PortRead16);
