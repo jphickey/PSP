@@ -30,42 +30,37 @@
 
 /**
  * \file
- * \ingroup  vxworks
- * \author   joseph.p.hickey@nasa.gov
+ * \ingroup  adaptors
  *
  */
 
-#ifndef COVERAGETEST_PSP_SHARED_H
-#define COVERAGETEST_PSP_SHARED_H
+#include "ut-adaptor-module.h"
+#include "target_config.h"
+#include "cfe_psp_module.h"
 
-#include "utassert.h"
-#include "uttest.h"
-#include "utstubs.h"
+const char *UT_Module_PeekEntryName(bool IsInternal, size_t EntryNum)
+{
+    CFE_StaticModuleLoadEntry_t *ListPtr;
 
-void Test_CFE_PSP_StatusToString(void);
+    if (IsInternal)
+    {
+        ListPtr = CFE_PSP_BASE_MODULE_LIST;
+    }
+    else
+    {
+        ListPtr = GLOBAL_CONFIGDATA.PspModuleList;
+    }
 
-void Test_CFE_PSP_GetVersionString(void);
-void Test_CFE_PSP_GetVersionCodeName(void);
-void Test_CFE_PSP_GetVersionNumber(void);
-void Test_CFE_PSP_GetBuildNumber(void);
+    while (EntryNum > 0 && ListPtr != NULL && ListPtr->Name != NULL)
+    {
+        --EntryNum;
+        ++ListPtr;
+    }
 
-void Test_CFE_PSP_Exception_GetBuffer(void);
-void Test_CFE_PSP_Exception_GetNextContextBuffer(void);
-void Test_CFE_PSP_Exception_GetSummary(void);
-void Test_CFE_PSP_Exception_CopyContext(void);
+    if (ListPtr != NULL)
+    {
+        return ListPtr->Name;
+    }
 
-void Test_CFE_PSP_ModuleInitList(void);
-void Test_CFE_PSP_ModuleInit(void);
-void Test_CFE_PSP_Module_GetAPIEntry(void);
-void Test_CFE_PSP_Module_SearchNameInList(void);
-void Test_CFE_PSP_Module_FindByName(void);
-
-void Test_CFE_PSP_MemCpy(void);
-void Test_CFE_PSP_MemSet(void);
-
-void Test_CFE_PSP_MemValidateRange(void);
-void Test_CFE_PSP_MemRanges(void);
-void Test_CFE_PSP_MemRangeSet(void);
-void Test_CFE_PSP_MemRangeGet(void);
-
-#endif
+    return NULL;
+}

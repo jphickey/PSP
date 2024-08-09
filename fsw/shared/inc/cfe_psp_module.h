@@ -91,6 +91,23 @@ typedef const struct
 void CFE_PSP_ModuleInit(void);
 
 /**
+ * Search for a specific module name within a module list
+ *
+ * This is an internal helper function, but declared in a header for unit testing purposes.
+ * This facilitates CFE_PSP_Module_FindByName and not intended to be called directly.
+ *
+ * \param ListPtr    List to search
+ * \param ListLength Number of entries in ListPtr
+ * \param IsInternal Set to true if the list reflects fixed modules (these use a different ID range)
+ * \param ModuleName Name to search for
+ *
+ * \returns Module ID of matching entry
+ * \retval  0 if name does not appear in list
+ */
+uint32 CFE_PSP_Module_SearchNameInList(CFE_StaticModuleLoadEntry_t *ListPtr, size_t ListLength, bool IsInternal,
+                                       const char *ModuleName);
+
+/**
  * Obtain the ID for a named module.
  *
  * Although this is currently prototyped as a function scoped to the PSP,

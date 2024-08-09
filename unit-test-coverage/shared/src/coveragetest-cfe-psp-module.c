@@ -37,17 +37,33 @@
 #include "utstubs.h"
 
 #include "cfe_psp_module.h"
+#include "ut-adaptor-module.h"
 
 extern uint32_t CFE_PSP_ModuleInitList(uint32 BaseId, CFE_StaticModuleLoadEntry_t *ListPtr);
+
+static void InitStub(uint32 PspModuleId)
+{
+    UT_DEFAULT_IMPL(InitStub);
+}
+
+CFE_PSP_ModuleApi_t UT_API_INVALID         = {.ModuleType = CFE_PSP_MODULE_TYPE_INVALID};
+CFE_PSP_ModuleApi_t UT_API_SIMPLE_NO_INIT  = {.ModuleType = CFE_PSP_MODULE_TYPE_SIMPLE};
+CFE_PSP_ModuleApi_t UT_API_SIMPLE_COMPLETE = {.ModuleType = CFE_PSP_MODULE_TYPE_SIMPLE, .Init = InitStub};
+
+static CFE_StaticModuleLoadEntry_t UT_STATIC_MODULE_LIST[] = {{.Name = "UT1", .Api = &UT_API_INVALID},
+                                                              {.Name = "UT2", .Api = &UT_API_SIMPLE_NO_INIT},
+                                                              {.Name = "UT3", .Api = &UT_API_SIMPLE_COMPLETE},
+                                                              {.Name = NULL, .Api = NULL}};
 
 void Test_CFE_PSP_ModuleInitList(void)
 {
     /* Test Case for:
      * uint32_t CFE_PSP_ModuleInitList(uint32 BaseId, CFE_StaticModuleLoadEntry_t *ListPtr)
      */
-    CFE_StaticModuleLoadEntry_t ListPtr[1] = {{0}};
 
-    UtAssert_UINT32_EQ(CFE_PSP_ModuleInitList(1, ListPtr), 0);
+    /* This returns the number of modules in the list */
+    UtAssert_UINT32_EQ(CFE_PSP_ModuleInitList(1, UT_STATIC_MODULE_LIST), 3);
+    UtAssert_STUB_COUNT(InitStub, 1);
 }
 
 void Test_CFE_PSP_ModuleInit(void)
@@ -64,8 +80,32 @@ void Test_CFE_PSP_Module_GetAPIEntry(void)
      * int32 CFE_PSP_Module_GetAPIEntry(uint32 PspModuleId, CFE_PSP_ModuleApi_t **API)
      */
     CFE_PSP_ModuleApi_t *API;
+    uint32               Id;
 
     UtAssert_INT32_EQ(CFE_PSP_Module_GetAPIEntry(0, &API), CFE_PSP_INVALID_MODULE_ID);
+
+    UtAssert_NONZERO(Id = CFE_PSP_Module_SearchNameInList(UT_STATIC_MODULE_LIST, 3, false, "UT1"));
+    UtAssert_INT32_EQ(CFE_PSP_Module_GetAPIEntry(Id, &API), CFE_PSP_INVALID_MODULE_ID);
+    UtAssert_INT32_EQ(CFE_PSP_Module_GetAPIEntry(Id | 0x7FFF, &API), CFE_PSP_INVALID_MODULE_ID);
+
+    UtAssert_NONZERO(Id = CFE_PSP_Module_SearchNameInList(UT_STATIC_MODULE_LIST, 3, true, "UT1"));
+    UtAssert_INT32_EQ(CFE_PSP_Module_GetAPIEntry(Id, &API), CFE_PSP_INVALID_MODULE_ID);
+    UtAssert_INT32_EQ(CFE_PSP_Module_GetAPIEntry(Id | 0x7FFF, &API), CFE_PSP_INVALID_MODULE_ID);
+}
+
+void Test_CFE_PSP_Module_SearchNameInList(void)
+{
+    /* Test Case for:
+     * uint32 CFE_PSP_Module_SearchNameInList(CFE_StaticModuleLoadEntry_t *ListPtr, size_t ListLength, bool IsInternal,
+     * const char *ModuleName);
+     */
+    uint32 Id;
+
+    UtAssert_ZERO(CFE_PSP_Module_SearchNameInList(UT_STATIC_MODULE_LIST, 3, true, "DoesNotExist"));
+    UtAssert_NONZERO(Id = CFE_PSP_Module_SearchNameInList(UT_STATIC_MODULE_LIST, 3, true, "UT2"));
+    UtAssert_UINT32_EQ(Id & 0xFF, 1);
+    UtAssert_NONZERO(Id = CFE_PSP_Module_SearchNameInList(UT_STATIC_MODULE_LIST, 3, false, "UT3"));
+    UtAssert_UINT32_EQ(Id & 0xFF, 2);
 }
 
 void Test_CFE_PSP_Module_FindByName(void)
@@ -73,6 +113,22 @@ void Test_CFE_PSP_Module_FindByName(void)
     /* Test Case for:
      * int32 CFE_PSP_Module_FindByName(const char *ModuleName, uint32 *PspModuleId)
      */
-    uint32 ModuleId;
-    UtAssert_INT32_EQ(CFE_PSP_Module_FindByName("UT", &ModuleId), CFE_PSP_INVALID_MODULE_NAME);
+    uint32      ModuleId;
+    const char *Name;
+
+    /* Module names are compiled in and not necessarily predictable */
+    UtAssert_INT32_EQ(CFE_PSP_Module_FindByName("NameDoesNotExist", &ModuleId), CFE_PSP_INVALID_MODULE_NAME);
+
+    /* the actual names are assembled at compile time and need to peek at this list to get a real name */
+    Name = UT_Module_PeekEntryName(true, 0);
+    if (Name != NULL)
+    {
+        UtAssert_INT32_EQ(CFE_PSP_Module_FindByName(Name, &ModuleId), CFE_PSP_SUCCESS);
+    }
+
+    Name = UT_Module_PeekEntryName(false, 0);
+    if (Name != NULL)
+    {
+        UtAssert_INT32_EQ(CFE_PSP_Module_FindByName(Name, &ModuleId), CFE_PSP_SUCCESS);
+    }
 }

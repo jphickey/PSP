@@ -38,31 +38,24 @@
 #include "cfe_psp_config.h"
 #include "cfe_psp_memory.h"
 
-#define CFE_PSP_MAX_EXCEPTION_ENTRIES        4
-#define CFE_PSP_MAX_EXCEPTION_BACKTRACE_SIZE 16
-
-uint32 UT_Get_Exception_MaxEntries(void)
+uint32 UT_Get_MemRange_MaxEntries(void)
 {
-    return ;
+    return CFE_PSP_MEM_TABLE_SIZE;
 }
 
-size_t UT_Get_Exception_Size(void)
+void UT_ClearMemRangeTable(void)
 {
-    return sizeof(CFE_PSP_Exception_ContextDataEntry_t);
+    memset(CFE_PSP_ReservedMemoryMap.SysMemoryTable, 0, sizeof(CFE_PSP_ReservedMemoryMap.SysMemoryTable));
 }
 
-void UT_Generate_Exception_Context(struct CFE_PSP_Exception_LogData *Buffer, size_t Size)
+void UT_SetupMemRangeTable(uint32 EntryNum, uint32 MemType, cpuaddr StartAddr, size_t Size, uint32 WordSize)
 {
-    size_t i;
-    uint8 *Dest = (uint8 *)&Buffer->context_info;
-    for (i = 0; i < Size && i < sizeof(Buffer->context_info); ++i)
-    {
-        *Dest = i & 0xFF;
-    }
-    Buffer->context_size = i;
-}
+    CFE_PSP_MemTable_t *SysMemPtr;
 
-uint32 UT_Get_Exception_Id(struct CFE_PSP_Exception_LogData *Buffer)
-{
-    return Buffer->context_id;
+    SysMemPtr = &CFE_PSP_ReservedMemoryMap.SysMemoryTable[EntryNum];
+
+    SysMemPtr->MemoryType = MemType;
+    SysMemPtr->StartAddr  = StartAddr;
+    SysMemPtr->WordSize   = WordSize;
+    SysMemPtr->Size       = Size;
 }

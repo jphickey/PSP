@@ -51,7 +51,7 @@
  */
 #define CFE_PSP_INTERNAL_MODULE_BASE ((CFE_PSP_MODULE_BASE | CFE_PSP_MODULE_INDEX_MASK) & ~0xFF)
 
-static uint32 CFE_PSP_ConfigPspModuleListLength = 0;
+static uint32 CFE_PSP_ConfigPspModuleListLength   = 0;
 static uint32 CFE_PSP_StandardPspModuleListLength = 0;
 
 /***************************************************
@@ -97,7 +97,8 @@ uint32_t CFE_PSP_ModuleInitList(uint32 BaseId, CFE_StaticModuleLoadEntry_t *List
 void CFE_PSP_ModuleInit(void)
 {
     /* First initialize the fixed set of modules for this PSP */
-    CFE_PSP_StandardPspModuleListLength = CFE_PSP_ModuleInitList(CFE_PSP_INTERNAL_MODULE_BASE, CFE_PSP_BASE_MODULE_LIST);
+    CFE_PSP_StandardPspModuleListLength =
+        CFE_PSP_ModuleInitList(CFE_PSP_INTERNAL_MODULE_BASE, CFE_PSP_BASE_MODULE_LIST);
 
     /* Then initialize any user-selected extension modules */
     CFE_PSP_ConfigPspModuleListLength = CFE_PSP_ModuleInitList(CFE_PSP_MODULE_BASE, GLOBAL_CONFIGDATA.PspModuleList);
@@ -116,7 +117,7 @@ int32 CFE_PSP_Module_GetAPIEntry(uint32 PspModuleId, CFE_PSP_ModuleApi_t **API)
     if ((PspModuleId & ~CFE_PSP_MODULE_INDEX_MASK) == CFE_PSP_MODULE_BASE)
     {
         /* Last 256 enteries are for internal modules */
-        if((PspModuleId & CFE_PSP_MODULE_INDEX_MASK) >= 0xFF00 )
+        if ((PspModuleId & CFE_PSP_MODULE_INDEX_MASK) >= 0xFF00)
         {
             LocalId = PspModuleId & 0xFF;
             if (LocalId < CFE_PSP_StandardPspModuleListLength)
@@ -139,50 +140,68 @@ int32 CFE_PSP_Module_GetAPIEntry(uint32 PspModuleId, CFE_PSP_ModuleApi_t **API)
     return Result;
 }
 
+uint32 CFE_PSP_Module_SearchNameInList(CFE_StaticModuleLoadEntry_t *ListPtr, size_t ListLength, bool IsInternal,
+                                       const char *ModuleName)
+{
+    CFE_StaticModuleLoadEntry_t *Entry;
+    uint32                       ResultId;
+    size_t                       i;
+
+    Entry    = ListPtr;
+    ResultId = 0;
+    i        = 0;
+
+    while (i < ListLength)
+    {
+        if (strcmp(Entry->Name, ModuleName) == 0)
+        {
+            if (IsInternal)
+            {
+                ResultId = CFE_PSP_INTERNAL_MODULE_BASE;
+            }
+            else
+            {
+                ResultId = CFE_PSP_MODULE_BASE;
+            }
+            ResultId |= (i & CFE_PSP_MODULE_INDEX_MASK);
+            break;
+        }
+
+        ++Entry;
+        ++i;
+    }
+
+    return ResultId;
+}
+
 /***************************************************
  *
  * See prototype for full description
  */
 int32 CFE_PSP_Module_FindByName(const char *ModuleName, uint32 *PspModuleId)
 {
-    uint32                       i;
-    int32                        Result;
-    CFE_StaticModuleLoadEntry_t *Entry;
-
-    Entry  = GLOBAL_CONFIGDATA.PspModuleList;
-    Result = CFE_PSP_INVALID_MODULE_NAME;
-    i      = 0;
+    int32  Result;
+    uint32 CheckId;
 
     /* Check global list */
-    while (i < CFE_PSP_ConfigPspModuleListLength)
+    CheckId = CFE_PSP_Module_SearchNameInList(GLOBAL_CONFIGDATA.PspModuleList, CFE_PSP_ConfigPspModuleListLength, false,
+                                              ModuleName);
+    if (CheckId == 0)
     {
-        if (strcmp(Entry->Name, ModuleName) == 0)
-        {
-            *PspModuleId = CFE_PSP_MODULE_BASE | (i & CFE_PSP_MODULE_INDEX_MASK);
-            Result       = CFE_PSP_SUCCESS;
-            break;
-        }
-        ++Entry;
-        ++i;
+        CheckId = CFE_PSP_Module_SearchNameInList(CFE_PSP_BASE_MODULE_LIST, CFE_PSP_StandardPspModuleListLength, true,
+                                                  ModuleName);
     }
 
-    /* Check internal list */
-    if (Result != CFE_PSP_SUCCESS)
+    if (CheckId != 0)
     {
-        Entry = CFE_PSP_BASE_MODULE_LIST;
-        i     = 0;
-        while (i < CFE_PSP_StandardPspModuleListLength)
-        {
-            if (strcmp(Entry->Name, ModuleName) == 0)
-            {
-                *PspModuleId = CFE_PSP_INTERNAL_MODULE_BASE | (i & CFE_PSP_MODULE_INDEX_MASK);
-                Result       = CFE_PSP_SUCCESS;
-                break;
-            }
-            ++Entry;
-            ++i;
-        }
+        Result = CFE_PSP_SUCCESS;
     }
+    else
+    {
+        Result = CFE_PSP_INVALID_MODULE_NAME;
+    }
+
+    *PspModuleId = CheckId;
 
     return Result;
 }

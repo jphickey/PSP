@@ -38,6 +38,8 @@
 
 #include "common_types.h"
 
+void   UT_ClearMemRangeTable(void);
 uint32 UT_Get_MemRange_MaxEntries(void);
+void   UT_SetupMemRangeTable(uint32 EntryNum, uint32 MemType, cpuaddr StartAddr, size_t Size, uint32 WordSize);
 
 #endif

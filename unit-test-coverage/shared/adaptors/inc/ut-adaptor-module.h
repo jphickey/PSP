@@ -30,42 +30,14 @@
 
 /**
  * \file
- * \ingroup  vxworks
- * \author   joseph.p.hickey@nasa.gov
- *
+ * \ingroup  adaptors
  */
 
-#ifndef COVERAGETEST_PSP_SHARED_H
-#define COVERAGETEST_PSP_SHARED_H
+#ifndef UT_ADAPTOR_MODULE_H
+#define UT_ADAPTOR_MODULE_H
 
-#include "utassert.h"
-#include "uttest.h"
-#include "utstubs.h"
+#include "common_types.h"
 
-void Test_CFE_PSP_StatusToString(void);
-
-void Test_CFE_PSP_GetVersionString(void);
-void Test_CFE_PSP_GetVersionCodeName(void);
-void Test_CFE_PSP_GetVersionNumber(void);
-void Test_CFE_PSP_GetBuildNumber(void);
-
-void Test_CFE_PSP_Exception_GetBuffer(void);
-void Test_CFE_PSP_Exception_GetNextContextBuffer(void);
-void Test_CFE_PSP_Exception_GetSummary(void);
-void Test_CFE_PSP_Exception_CopyContext(void);
-
-void Test_CFE_PSP_ModuleInitList(void);
-void Test_CFE_PSP_ModuleInit(void);
-void Test_CFE_PSP_Module_GetAPIEntry(void);
-void Test_CFE_PSP_Module_SearchNameInList(void);
-void Test_CFE_PSP_Module_FindByName(void);
-
-void Test_CFE_PSP_MemCpy(void);
-void Test_CFE_PSP_MemSet(void);
-
-void Test_CFE_PSP_MemValidateRange(void);
-void Test_CFE_PSP_MemRanges(void);
-void Test_CFE_PSP_MemRangeSet(void);
-void Test_CFE_PSP_MemRangeGet(void);
+const char *UT_Module_PeekEntryName(bool IsInternal, size_t EntryNum);
 
 #endif

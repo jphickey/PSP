@@ -44,9 +44,23 @@ void Test_CFE_PSP_MemValidateRange(void)
     /* Test Case For:
      * int32 CFE_PSP_MemValidateRange(cpuaddr Address, size_t Size, uint32 MemoryType)
      */
+    UT_ClearMemRangeTable();
+
     UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, 0), CFE_PSP_INVALID_MEM_TYPE);
     UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(-1, 32, CFE_PSP_MEM_RAM), CFE_PSP_INVALID_MEM_RANGE);
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, CFE_PSP_MEM_RAM), CFE_PSP_INVALID_MEM_ADDR);
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, CFE_PSP_MEM_EEPROM), CFE_PSP_INVALID_MEM_ADDR);
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, CFE_PSP_MEM_ANY), CFE_PSP_INVALID_MEM_ADDR);
+
+    UT_SetupMemRangeTable(1, CFE_PSP_MEM_RAM, 0, 0x1000, 4);
+    UT_SetupMemRangeTable(2, CFE_PSP_MEM_INVALID, 0x1000, 0x1000, 4);
+    UT_SetupMemRangeTable(3, CFE_PSP_MEM_EEPROM, 0x2000, 0x1000, 4);
     UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, CFE_PSP_MEM_RAM), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0x2000, 32, CFE_PSP_MEM_EEPROM), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0x1000, 32, CFE_PSP_MEM_RAM), CFE_PSP_INVALID_MEM_ADDR);
+
+    /* Validate a range that crosses from one region into another */
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0x800, 0x1000, CFE_PSP_MEM_RAM), CFE_PSP_INVALID_MEM_ADDR);
 }
 
 void Test_CFE_PSP_MemRanges(void)
@@ -54,7 +68,7 @@ void Test_CFE_PSP_MemRanges(void)
     /* Test Case For:
      * uint32 CFE_PSP_MemRanges(void)
      */
-    UtAssert_NONZERO(CFE_PSP_MemRanges());
+    UtAssert_UINT32_EQ(CFE_PSP_MemRanges(), UT_Get_MemRange_MaxEntries());
 }
 
 void Test_CFE_PSP_MemRangeSet(void)
@@ -63,7 +77,18 @@ void Test_CFE_PSP_MemRangeSet(void)
      * int32 CFE_PSP_MemRangeSet(uint32 RangeNum, uint32 MemoryType, cpuaddr StartAddr, size_t Size, size_t WordSize,
      * uint32 Attributes)
      */
-    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 4, 0), CFE_PSP_INVALID_MEM_ATTR);
+    UT_ClearMemRangeTable();
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(UINT32_MAX, CFE_PSP_MEM_RAM, 0, 32, 1, 0), CFE_PSP_INVALID_MEM_RANGE);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, 0, 0, 32, 1, 0), CFE_PSP_INVALID_MEM_TYPE);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 1, 0), CFE_PSP_INVALID_MEM_ATTR);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 1, 0), CFE_PSP_INVALID_MEM_ATTR);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 2, CFE_PSP_MEM_ATTR_READWRITE), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 4, CFE_PSP_MEM_ATTR_READWRITE), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_RAM, 0, 32, 8, CFE_PSP_MEM_ATTR_READWRITE),
+                      CFE_PSP_INVALID_MEM_WORDSIZE);
+
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_EEPROM, 32, 32, 4, CFE_PSP_MEM_ATTR_WRITE), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeSet(0, CFE_PSP_MEM_EEPROM, 32, 32, 4, CFE_PSP_MEM_ATTR_READ), CFE_PSP_SUCCESS);
 }
 
 void Test_CFE_PSP_MemRangeGet(void)
@@ -78,5 +103,13 @@ void Test_CFE_PSP_MemRangeGet(void)
     size_t  WordSize;
     uint32  Attribs;
 
+    UT_ClearMemRangeTable();
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(UINT32_MAX, &MemType, &StartAddr, &MemSize, &WordSize, &Attribs),
+                      CFE_PSP_INVALID_MEM_RANGE);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, NULL, &StartAddr, &MemSize, &WordSize, &Attribs), CFE_PSP_INVALID_POINTER);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, &MemType, NULL, &MemSize, &WordSize, &Attribs), CFE_PSP_INVALID_POINTER);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, &MemType, &StartAddr, NULL, &WordSize, &Attribs), CFE_PSP_INVALID_POINTER);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, &MemType, &StartAddr, &MemSize, NULL, &Attribs), CFE_PSP_INVALID_POINTER);
+    UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, &MemType, &StartAddr, &MemSize, &WordSize, NULL), CFE_PSP_INVALID_POINTER);
     UtAssert_INT32_EQ(CFE_PSP_MemRangeGet(0, &MemType, &StartAddr, &MemSize, &WordSize, &Attribs), CFE_PSP_SUCCESS);
 }

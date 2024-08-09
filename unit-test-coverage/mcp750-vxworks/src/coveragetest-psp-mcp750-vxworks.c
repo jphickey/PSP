@@ -85,6 +85,7 @@ void UtTest_Setup(void)
     ADD_TEST(CFE_PSP_ModuleInitList);
     ADD_TEST(CFE_PSP_ModuleInit);
     ADD_TEST(CFE_PSP_Module_GetAPIEntry);
+    ADD_TEST(CFE_PSP_Module_SearchNameInList);
     ADD_TEST(CFE_PSP_Module_FindByName);
 
     ADD_TEST(CFE_PSP_MemCpy);
