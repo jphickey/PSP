@@ -36,6 +36,7 @@
 #include "utassert.h"
 #include "utstubs.h"
 
+#include "ut-adaptor-memrange.h"
 #include "cfe_psp_memrange_api.h"
 
 void Test_CFE_PSP_MemValidateRange(void)
@@ -43,6 +44,8 @@ void Test_CFE_PSP_MemValidateRange(void)
     /* Test Case For:
      * int32 CFE_PSP_MemValidateRange(cpuaddr Address, size_t Size, uint32 MemoryType)
      */
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, 0), CFE_PSP_INVALID_MEM_TYPE);
+    UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(-1, 32, CFE_PSP_MEM_RAM), CFE_PSP_INVALID_MEM_RANGE);
     UtAssert_INT32_EQ(CFE_PSP_MemValidateRange(0, 32, CFE_PSP_MEM_RAM), CFE_PSP_SUCCESS);
 }
 
