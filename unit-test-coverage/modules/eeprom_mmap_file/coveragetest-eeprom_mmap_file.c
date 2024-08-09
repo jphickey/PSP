@@ -43,7 +43,20 @@
 #include "cfe_psp_config.h"
 #include "cfe_psp_module.h"
 
+#include "PCS_sys_stat.h"
+#include "PCS_sys_mman.h"
+#include "PCS_unistd.h"
+
 extern void eeprom_mmap_file_Init(uint32 PspModuleId);
+
+#define UT_RAMBLOCK_SIZE 32
+
+static union
+{
+    uint8  u8[UT_RAMBLOCK_SIZE];
+    uint16 u16[UT_RAMBLOCK_SIZE / sizeof(uint16)];
+    uint32 u32[UT_RAMBLOCK_SIZE / sizeof(uint32)];
+} UT_RAM_BLOCK;
 
 void Test_eeprom_mmap_file_Init(void)
 {
@@ -51,6 +64,31 @@ void Test_eeprom_mmap_file_Init(void)
     void eeprom_mmap_file_Init(uint32 PspModuleId)
     */
 
+    /* nominal */
+    UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
+
+    /* fail to mmap file */
+    UT_SetDeferredRetcode(UT_KEY(PCS_mmap), 1, -1);
+    UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
+
+    /* fail to create new file file */
+    UT_SetDeferredRetcode(UT_KEY(PCS_open), 1, -1);
+    UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
+
+    /* file exists */
+    UT_SetDefaultReturnValue(UT_KEY(PCS_stat), -1);
+    UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
+
+    /* fail to open existing file */
+    UT_SetDeferredRetcode(UT_KEY(PCS_open), 1, -1);
+    UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
+
+    /* fail to seek in existing file */
+    UT_SetDeferredRetcode(UT_KEY(PCS_lseek), 1, -1);
+    UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
+
+    /* write success in existing file */
+    UT_SetDeferredRetcode(UT_KEY(PCS_write), 1, 1);
     UtAssert_VOIDCALL(eeprom_mmap_file_Init(1));
 }
 
@@ -59,7 +97,17 @@ void Test_CFE_PSP_EepromWrite32(void)
     /*
     int32 CFE_PSP_EepromWrite32(cpuaddr MemoryAddress, uint32 uint32Value)
     */
-    UtAssert_INT32_EQ(CFE_PSP_EepromWrite32(0, 1), CFE_PSP_SUCCESS);
+
+    cpuaddr UtAddress1;
+    cpuaddr UtAddress2;
+
+    UtAddress1 = (cpuaddr)&UT_RAM_BLOCK.u32[2];
+    UtAddress2 = (cpuaddr)&UT_RAM_BLOCK.u32[3];
+
+    UtAssert_INT32_EQ(CFE_PSP_EepromWrite32(UtAddress1, 0xBB997755), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_EepromWrite32(UtAddress2, 0xCCAA8866), CFE_PSP_SUCCESS);
+    UtAssert_UINT32_EQ(UT_RAM_BLOCK.u32[2], 0xBB997755);
+    UtAssert_UINT32_EQ(UT_RAM_BLOCK.u32[3], 0xCCAA8866);
 }
 
 void Test_CFE_PSP_EepromWrite16(void)
@@ -67,15 +115,35 @@ void Test_CFE_PSP_EepromWrite16(void)
     /*
     int32 CFE_PSP_EepromWrite16(cpuaddr MemoryAddress, uint16 uint16Value)
     */
-    UtAssert_INT32_EQ(CFE_PSP_EepromWrite16(0, 1), CFE_PSP_SUCCESS);
+
+    cpuaddr UtAddress1;
+    cpuaddr UtAddress2;
+
+    UtAddress1 = (cpuaddr)&UT_RAM_BLOCK.u16[6];
+    UtAddress2 = (cpuaddr)&UT_RAM_BLOCK.u16[7];
+
+    UtAssert_INT32_EQ(CFE_PSP_EepromWrite16(UtAddress1, 0xBBDD), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_EepromWrite16(UtAddress2, 0xCCEE), CFE_PSP_SUCCESS);
+    UtAssert_UINT16_EQ(UT_RAM_BLOCK.u16[6], 0xBBDD);
+    UtAssert_UINT16_EQ(UT_RAM_BLOCK.u16[7], 0xCCEE);
 }
 
 void Test_CFE_PSP_EepromWrite8(void)
 {
     /*
     int32 CFE_PSP_EepromWrite8(cpuaddr MemoryAddress, uint8 ByteValue)
-    */
-    UtAssert_INT32_EQ(CFE_PSP_EepromWrite8(0, 1), CFE_PSP_SUCCESS);
+     */
+
+    cpuaddr UtAddress1;
+    cpuaddr UtAddress2;
+
+    UtAddress1 = (cpuaddr)&UT_RAM_BLOCK.u8[4];
+    UtAddress2 = (cpuaddr)&UT_RAM_BLOCK.u8[5];
+
+    UtAssert_INT32_EQ(CFE_PSP_EepromWrite8(UtAddress1, 0xBB), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_EepromWrite8(UtAddress2, 0xCC), CFE_PSP_SUCCESS);
+    UtAssert_UINT8_EQ(UT_RAM_BLOCK.u8[4], 0xBB);
+    UtAssert_UINT8_EQ(UT_RAM_BLOCK.u8[5], 0xCC);
 }
 
 void Test_CFE_PSP_EepromWriteEnable(void)
@@ -83,7 +151,7 @@ void Test_CFE_PSP_EepromWriteEnable(void)
     /*
     int32 CFE_PSP_EepromWriteEnable(uint32 Bank)
     */
-    UtAssert_INT32_EQ(CFE_PSP_EepromWriteEnable(1), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_EepromWriteEnable(1), CFE_PSP_ERROR_NOT_IMPLEMENTED);
 }
 
 void Test_CFE_PSP_EepromWriteDisable(void)
@@ -91,7 +159,7 @@ void Test_CFE_PSP_EepromWriteDisable(void)
     /*
     int32 CFE_PSP_EepromWriteDisable(uint32 Bank)
     */
-    UtAssert_INT32_EQ(CFE_PSP_EepromWriteDisable(1), CFE_PSP_SUCCESS);
+    UtAssert_INT32_EQ(CFE_PSP_EepromWriteDisable(1), CFE_PSP_ERROR_NOT_IMPLEMENTED);
 }
 
 void Test_CFE_PSP_EepromPowerUp(void)
@@ -113,7 +181,13 @@ void Test_CFE_PSP_EepromPowerDown(void)
 /*
  * Macro to add a test case to the list of tests to execute
  */
-#define ADD_TEST(test) UtTest_Add(test, NULL, NULL, #test)
+#define ADD_TEST(test) UtTest_Add(test, ResetTest, NULL, #test)
+
+void ResetTest(void)
+{
+    UT_ResetState(0);
+    memset(&UT_RAM_BLOCK, 0, sizeof(UT_RAM_BLOCK));
+}
 
 /*
  * Register the test cases to execute with the unit test tool

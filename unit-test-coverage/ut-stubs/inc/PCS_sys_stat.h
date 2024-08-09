@@ -16,29 +16,34 @@
  * limitations under the License.
  ************************************************************************/
 
-/* PSP coverage stub replacement for sys/types.h */
-#ifndef PCS_SYS_TYPES_H
-#define PCS_SYS_TYPES_H
+/* PSP coverage stub replacement for sys/stat.h */
+#ifndef PCS_SYS_STAT_H
+#define PCS_SYS_STAT_H
 
 #include "PCS_basetypes.h"
 
 /* ----------------------------------------- */
-/* constants normally defined in sys/types.h */
+/* constants normally defined in sys/stat.h */
 /* ----------------------------------------- */
 
-/* ----------------------------------------- */
-/* types normally defined in sys/types.h */
-/* ----------------------------------------- */
-typedef ptrdiff_t    PCS_ssize_t;
-typedef long         PCS_off_t;
-typedef unsigned int PCS_mode_t;
-typedef long         PCS_time_t;
-typedef int          PCS_pid_t;
-typedef int          PCS_gid_t;
-typedef int          PCS_uid_t;
+#define PCS_O_CREAT  0x101A
+#define PCS_O_RDONLY 0x101B
+#define PCS_O_RDWR   0x101C
+#define PCS_S_IRWXU  0x1010
 
 /* ----------------------------------------- */
-/* prototypes normally declared in sys/types.h */
+/* types normally defined in sys/stat.h */
 /* ----------------------------------------- */
+struct PCS_stat
+{
+    int x;
+};
+
+/* ----------------------------------------- */
+/* prototypes normally declared in sys/stat.h */
+/* ----------------------------------------- */
+
+extern int PCS_stat(const char *path, struct PCS_stat *buf);
+extern int PCS_open(const char *path, int oflag, ...);
 
 #endif

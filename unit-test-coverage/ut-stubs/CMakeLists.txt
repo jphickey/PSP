@@ -53,6 +53,8 @@ add_library(ut_psp_libc_stubs STATIC EXCLUDE_FROM_ALL
     src/vxworks-spyLibP-stubs.c
     src/rtems-bsdnet-stubs.c
     src/PCS_unistd_stubs.c
+    src/PCS_sys_stat_stubs.c
+    src/PCS_sys_mman_stubs.c
 )
 
 target_include_directories(ut_libc_stubs PUBLIC

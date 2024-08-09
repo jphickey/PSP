@@ -16,29 +16,21 @@
  * limitations under the License.
  ************************************************************************/
 
-/* PSP coverage stub replacement for sys/types.h */
-#ifndef PCS_SYS_TYPES_H
-#define PCS_SYS_TYPES_H
+/* PSP coverage stub replacement for sys/stat.h */
+#ifndef OVERRIDE_SYS_STAT_H
+#define OVERRIDE_SYS_STAT_H
 
-#include "PCS_basetypes.h"
-
-/* ----------------------------------------- */
-/* constants normally defined in sys/types.h */
-/* ----------------------------------------- */
+#include "PCS_sys_stat.h"
 
 /* ----------------------------------------- */
-/* types normally defined in sys/types.h */
+/* mappings for declarations in sys/stat.h */
 /* ----------------------------------------- */
-typedef ptrdiff_t    PCS_ssize_t;
-typedef long         PCS_off_t;
-typedef unsigned int PCS_mode_t;
-typedef long         PCS_time_t;
-typedef int          PCS_pid_t;
-typedef int          PCS_gid_t;
-typedef int          PCS_uid_t;
+#define O_CREAT  PCS_O_CREAT
+#define O_RDONLY PCS_O_RDONLY
+#define O_RDWR   PCS_O_RDWR
+#define S_IRWXU  PCS_S_IRWXU
 
-/* ----------------------------------------- */
-/* prototypes normally declared in sys/types.h */
-/* ----------------------------------------- */
+#define open PCS_open
+#define stat PCS_stat
 
 #endif

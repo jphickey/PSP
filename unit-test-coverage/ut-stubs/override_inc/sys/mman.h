@@ -16,29 +16,25 @@
  * limitations under the License.
  ************************************************************************/
 
-/* PSP coverage stub replacement for sys/types.h */
-#ifndef PCS_SYS_TYPES_H
-#define PCS_SYS_TYPES_H
+/* PSP coverage stub replacement for sys/mman.h */
+#ifndef OVERRIDE_SYS_MMAN_H
+#define OVERRIDE_SYS_MMAN_H
 
-#include "PCS_basetypes.h"
-
-/* ----------------------------------------- */
-/* constants normally defined in sys/types.h */
-/* ----------------------------------------- */
+#include "PCS_sys_mman.h"
 
 /* ----------------------------------------- */
-/* types normally defined in sys/types.h */
+/* mappings for declarations in sys/mman.h */
 /* ----------------------------------------- */
-typedef ptrdiff_t    PCS_ssize_t;
-typedef long         PCS_off_t;
-typedef unsigned int PCS_mode_t;
-typedef long         PCS_time_t;
-typedef int          PCS_pid_t;
-typedef int          PCS_gid_t;
-typedef int          PCS_uid_t;
 
-/* ----------------------------------------- */
-/* prototypes normally declared in sys/types.h */
-/* ----------------------------------------- */
+#define PROT_READ   PCS_PROT_READ
+#define PROT_WRITE  PCS_PROT_WRITE
+#define PROT_EXEC   PCS_PROT_EXEC
+#define PROT_NONE   PCS_PROT_NONE
+#define MAP_SHARED  PCS_MAP_SHARED
+#define MAP_PRIVATE PCS_MAP_PRIVATE
+#define MAP_FIXED   PCS_MAP_FIXED
+
+#define off_t PCS_off_t
+#define mmap  PCS_mmap
 
 #endif

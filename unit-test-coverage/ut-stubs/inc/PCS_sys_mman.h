@@ -16,29 +16,33 @@
  * limitations under the License.
  ************************************************************************/
 
-/* PSP coverage stub replacement for sys/types.h */
-#ifndef PCS_SYS_TYPES_H
-#define PCS_SYS_TYPES_H
+/* PSP coverage stub replacement for sys/mman.h */
+#ifndef PCS_SYS_MMAN_H
+#define PCS_SYS_MMAN_H
 
 #include "PCS_basetypes.h"
+#include "PCS_sys_types.h"
 
 /* ----------------------------------------- */
-/* constants normally defined in sys/types.h */
+/* constants normally defined in sys/mman.h */
+/* ----------------------------------------- */
+
+#define PCS_PROT_READ   0x1D21
+#define PCS_PROT_WRITE  0x1D22
+#define PCS_PROT_EXEC   0x1D23
+#define PCS_PROT_NONE   0x1D24
+#define PCS_MAP_SHARED  0x1D25
+#define PCS_MAP_PRIVATE 0x1D26
+#define PCS_MAP_FIXED   0x1D27
+
+/* ----------------------------------------- */
+/* types normally defined in sys/mman.h */
 /* ----------------------------------------- */
 
 /* ----------------------------------------- */
-/* types normally defined in sys/types.h */
+/* prototypes normally declared in sys/mman.h */
 /* ----------------------------------------- */
-typedef ptrdiff_t    PCS_ssize_t;
-typedef long         PCS_off_t;
-typedef unsigned int PCS_mode_t;
-typedef long         PCS_time_t;
-typedef int          PCS_pid_t;
-typedef int          PCS_gid_t;
-typedef int          PCS_uid_t;
 
-/* ----------------------------------------- */
-/* prototypes normally declared in sys/types.h */
-/* ----------------------------------------- */
+extern void *PCS_mmap(void *addr, size_t len, int prot, int flags, int fildes, PCS_off_t off);
 
 #endif

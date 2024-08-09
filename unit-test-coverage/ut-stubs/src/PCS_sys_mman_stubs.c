@@ -16,29 +16,32 @@
  * limitations under the License.
  ************************************************************************/
 
-/* PSP coverage stub replacement for sys/types.h */
-#ifndef PCS_SYS_TYPES_H
-#define PCS_SYS_TYPES_H
+/**
+ * @file
+ *
+ * Auto-Generated stub implementations for functions defined in PCS_sys_mman header
+ */
 
-#include "PCS_basetypes.h"
+#include "PCS_sys_mman.h"
+#include "utgenstub.h"
 
-/* ----------------------------------------- */
-/* constants normally defined in sys/types.h */
-/* ----------------------------------------- */
+/*
+ * ----------------------------------------------------
+ * Generated stub function for PCS_mmap()
+ * ----------------------------------------------------
+ */
+void *PCS_mmap(void *addr, size_t len, int prot, int flags, int fildes, PCS_off_t off)
+{
+    UT_GenStub_SetupReturnBuffer(PCS_mmap, void *);
 
-/* ----------------------------------------- */
-/* types normally defined in sys/types.h */
-/* ----------------------------------------- */
-typedef ptrdiff_t    PCS_ssize_t;
-typedef long         PCS_off_t;
-typedef unsigned int PCS_mode_t;
-typedef long         PCS_time_t;
-typedef int          PCS_pid_t;
-typedef int          PCS_gid_t;
-typedef int          PCS_uid_t;
+    UT_GenStub_AddParam(PCS_mmap, void *, addr);
+    UT_GenStub_AddParam(PCS_mmap, size_t, len);
+    UT_GenStub_AddParam(PCS_mmap, int, prot);
+    UT_GenStub_AddParam(PCS_mmap, int, flags);
+    UT_GenStub_AddParam(PCS_mmap, int, fildes);
+    UT_GenStub_AddParam(PCS_mmap, PCS_off_t, off);
 
-/* ----------------------------------------- */
-/* prototypes normally declared in sys/types.h */
-/* ----------------------------------------- */
+    UT_GenStub_Execute(PCS_mmap, Basic, NULL);
 
-#endif
+    return UT_GenStub_GetReturnValue(PCS_mmap, void *);
+}
