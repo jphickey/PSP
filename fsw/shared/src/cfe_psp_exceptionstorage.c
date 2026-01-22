@@ -54,6 +54,7 @@
 void CFE_PSP_Exception_Reset(void)
 {
     /* just reset the counter */
+    PSP_DEBUG("Resetting Execption Log [Discarded Entries: %2lu]...\n", CFE_PSP_Exception_GetCount());
     CFE_PSP_ReservedMemoryMap.ExceptionStoragePtr->NumRead = CFE_PSP_ReservedMemoryMap.ExceptionStoragePtr->NumWritten;
 }
 

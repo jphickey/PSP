@@ -26,8 +26,6 @@
 #include "PCS_cpuuse.h"
 #include "utgenstub.h"
 
-
-
 /*
  * ----------------------------------------------------
  * Generated stub function for PCS_rtems_cpu_usage_reset()

@@ -22,6 +22,8 @@
  * Auto-Generated stub implementations for functions defined in cfe_psp header
  */
 
+#include <stdarg.h>
+
 #include "cfe_psp.h"
 #include "utgenstub.h"
 
@@ -34,4 +36,23 @@ void CFE_PSP_Main(void)
 {
 
     UT_GenStub_Execute(CFE_PSP_Main, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for PSP_DebugPrintf()
+ * ----------------------------------------------------
+ */
+void PSP_DebugPrintf(uint32 Level, const char *Func, uint32 Line, const char *Format, ...)
+{
+    va_list UtStub_ArgList;
+
+    UT_GenStub_AddParam(PSP_DebugPrintf, uint32, Level);
+    UT_GenStub_AddParam(PSP_DebugPrintf, const char *, Func);
+    UT_GenStub_AddParam(PSP_DebugPrintf, uint32, Line);
+    UT_GenStub_AddParam(PSP_DebugPrintf, const char *, Format);
+
+    va_start(UtStub_ArgList, Format);
+    UT_GenStub_Execute(PSP_DebugPrintf, Va, NULL, UtStub_ArgList);
+    va_end(UtStub_ArgList);
 }

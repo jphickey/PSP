@@ -400,6 +400,22 @@ int32 CFE_PSP_InitProcessorReservedMemory(uint32 RestartType)
     return CFE_PSP_SUCCESS;
 }
 
+/******************************************************************************
+**
+**  Purpose:
+**    This function frees the top level reserved memory.
+**
+**  Arguments:
+**    (none)
+**
+**  Return:
+**    (none)
+*/
+void CFE_PSP_DeleteProcessorReservedMemory(void)
+{
+    free(PcRtems_ReservedMemBlock.BlockPtr);
+}
+
 /*
 *********************************************************************************
 ** ES BSP kernel memory segment functions
