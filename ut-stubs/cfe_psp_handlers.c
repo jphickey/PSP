@@ -411,7 +411,7 @@ void UT_DefaultHandler_CFE_PSP_GetCFETextSizeOfCFESegment(void                  
         if (TempAddr == NULL)
         {
             /* Backup -- Set the pointer and size to anything */
-            TempAddr = (cpuaddr)&LocalTextSegment;
+            TempAddr = &LocalTextSegment;
             TempSize = sizeof(LocalTextSegment);
         }
 
@@ -463,7 +463,7 @@ void UT_DefaultHandler_CFE_PSP_GetKernelTextSizeOfKernelSegment(void            
         if (TempAddr == NULL)
         {
             /* Backup -- Set the pointer and size to anything */
-            TempAddr = (cpuaddr)&LocalTextSegment;
+            TempAddr = &LocalTextSegment;
             TempSize = sizeof(LocalTextSegment);
         }
 
@@ -579,7 +579,6 @@ void UT_DefaultHandler_CFE_PSP_Exception_GetSummary(void                   *User
     uint32    *ContextLogId = UT_Hook_GetArgValueByName(Context, "ContextLogId", uint32 *);
     osal_id_t *TaskId       = UT_Hook_GetArgValueByName(Context, "TaskId", osal_id_t *);
     char      *ReasonBuf    = UT_Hook_GetArgValueByName(Context, "ReasonBuf", char *);
-    uint32     ReasonSize   = UT_Hook_GetArgValueByName(Context, "ReasonSize", uint32);
 
     int32 status;
 
@@ -590,7 +589,7 @@ void UT_DefaultHandler_CFE_PSP_Exception_GetSummary(void                   *User
     if (!UT_Stub_GetInt32StatusCode(Context, &status) && TaskId != NULL)
     {
         if (status >= 0 &&
-            UT_Stub_CopyToLocal(UT_KEY(CFE_PSP_Exception_GetSummary), TaskId, sizeof(*TaskId) < sizeof(*TaskId)))
+            UT_Stub_CopyToLocal(UT_KEY(CFE_PSP_Exception_GetSummary), TaskId, sizeof(*TaskId)) < sizeof(*TaskId))
         {
             *TaskId = OS_OBJECT_ID_UNDEFINED;
         }
@@ -601,7 +600,6 @@ void UT_DefaultHandler_CFE_PSP_Exception_CopyContext(void                   *Use
                                                      UT_EntryKey_t           FuncKey,
                                                      const UT_StubContext_t *Context)
 {
-    uint32 ContextLogId = UT_Hook_GetArgValueByName(Context, "ContextLogId", uint32);
     void  *ContextBuf   = UT_Hook_GetArgValueByName(Context, "ContextBuf", void *);
     uint32 ContextSize  = UT_Hook_GetArgValueByName(Context, "ContextSize", uint32);
 
